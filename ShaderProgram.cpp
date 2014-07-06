@@ -65,6 +65,7 @@ bool ShaderProgram::Build(string vertexShaderSource, string fragmentShaderSource
 void ShaderProgram::GetLog(GLuint handle, char *buffer, int bufferSize)
 {
     glGetShaderInfoLog(handle, bufferSize, &bufferSize, buffer);
+    glGetProgramInfoLog(handle, bufferSize, &bufferSize, buffer);
 }
 
 void ShaderProgram::Activate()
