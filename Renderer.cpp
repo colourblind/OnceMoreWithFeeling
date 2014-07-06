@@ -1,7 +1,12 @@
 #include "Renderer.h"
+#include "Maths.h"
 
 using namespace OnceMoreWithFeeling;
 using namespace std;
+ 
+float PI = 3.14159265359f;
+
+float rot = 0;
 
 Renderer::Renderer()
 {
@@ -19,26 +24,24 @@ void Renderer::Render()
     shared_ptr<ShaderProgram> basicProgram = shaders_["basic|basic"];
     basicProgram->Activate();
 
-    float model[] = {
-        1.0f, 0.0f, 0.0f, 0.0f, 
-        0.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f 
-    };
+    float aspectRatio = static_cast<float>(height_) / width_;
+    float nearClip = 1;
+    float farClip = 20;
+    float fov = PI / 3;
 
-    float view[] = {
-        1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f
-    };
+    rot += 0.01f;
 
-    float proj[] = {
-        1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f
-    };
+    Matrix model = Matrix::Rotate(0, rot, 0);
+    Matrix view = Matrix::Translate(0, 0, -6);
+    Matrix proj;
+    
+    float s = 1.f / tan(fov / 2);
+    proj.a[0][0] = aspectRatio * s;
+    proj.a[1][1] = s;
+    proj.a[2][2] = -farClip / (farClip - nearClip);
+    proj.a[2][3] = -(farClip * nearClip) / (farClip - nearClip);
+    proj.a[3][2] = -1;
+    proj.a[3][3] = 0;
 
     float colour[] = { 1.0f, 1.0f, 0.0f };
     
@@ -47,9 +50,9 @@ void Renderer::Render()
     GLint p = glGetUniformLocation(basicProgram->Handle(), "p");
     GLint c = glGetUniformLocation(basicProgram->Handle(), "colour");
 
-    glUniformMatrix4fv(m, 1, GL_FALSE, model);
-    glUniformMatrix4fv(v, 1, GL_FALSE, view);
-    glUniformMatrix4fv(p, 1, GL_FALSE, proj);
+    glUniformMatrix4fv(m, 1, GL_FALSE, model.gl());
+    glUniformMatrix4fv(v, 1, GL_FALSE, view.gl());
+    glUniformMatrix4fv(p, 1, GL_FALSE, proj.gl());
     glUniform3fv(c, 1, colour);
 
     glEnable(GL_DEPTH_TEST);
@@ -70,4 +73,10 @@ void Renderer::AddShader(string vertexShaderName, string fragmentShaderName)
 
     string name = vertexShaderName + '|' + fragmentShaderName;
     shaders_.insert(make_pair(name, program));
+}
+
+void Renderer::SetWindowSize(unsigned int width, unsigned int height)
+{
+    width_ = width;
+    height_ = height;
 }

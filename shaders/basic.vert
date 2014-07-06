@@ -11,6 +11,8 @@ uniform mat4 p;
 
 void main()
 {
-    lightIntensity = vec3(1.0, 1.0, 1.0);
-    gl_Position = p * m * v * vec4(vertex, 1.0);
+    vec3 lightDir = normalize(vec3(0.0, 1.0, 0.5));
+    mat3 normalMatrix = transpose(inverse(mat3(m)));
+    lightIntensity = vec3(dot(normalMatrix * normal, lightDir));
+    gl_Position = p * v * m * vec4(vertex, 1.0);
 }

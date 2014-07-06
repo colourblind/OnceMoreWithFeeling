@@ -114,6 +114,7 @@ Window::~Window()
 int Window::Loop(shared_ptr<Renderer> renderer)
 {
     renderer->AddShader("basic", "basic");
+    renderer->SetWindowSize(width_, height_);
 
     // Main message loop:
     MSG msg;
