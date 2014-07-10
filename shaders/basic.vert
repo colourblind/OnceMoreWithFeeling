@@ -1,9 +1,10 @@
-#version 400
+#version 410
 
 layout(location = 0) in vec3 vertex;
 layout(location = 1) in vec3 normal;
 
-out vec3 lightIntensity;
+layout(location = 0) out vec3 normalOut;
+layout(location = 1) out vec3 positionOut;
 
 uniform mat4 m;
 uniform mat4 v;
@@ -11,8 +12,8 @@ uniform mat4 p;
 
 void main()
 {
-    vec3 lightDir = normalize(vec3(0.0, 1.0, 0.5));
     mat3 normalMatrix = transpose(inverse(mat3(m)));
-    lightIntensity = vec3(dot(normalMatrix * normal, lightDir));
+    normalOut = normalMatrix * normal;
+    positionOut = (m * vec4(vertex, 1.0)).xyz;
     gl_Position = p * v * m * vec4(vertex, 1.0);
 }
