@@ -8,6 +8,10 @@ float PI = 3.14159265359f;
 
 float rot = 0;
 
+Vector cameraPos(0, 0, 6);
+Vector cameraLookat;
+Vector objectPos;
+
 Renderer::Renderer()
 {
 
@@ -29,18 +33,20 @@ void Renderer::Render()
     float farClip = 20;
     float fov = PI / 3;
 
-    rot += 0.01f;
+    //rot += 0.0001f;
+    //cameraPos.x += 0.0005f;
+    objectPos.x += 0.0005f;
 
-    Matrix model = Matrix::Rotate(0, rot, 0);
-    Matrix view = Matrix::Translate(0, 0, -6);
+    Matrix model = Matrix::Translate(objectPos) * Matrix::Rotate(0, rot, 0);
+    Matrix view = Matrix::Camera(cameraPos, cameraLookat);
     Matrix proj;
     
     float s = 1.f / tan(fov / 2);
     proj.a[0][0] = aspectRatio * s;
     proj.a[1][1] = s;
-    proj.a[2][2] = -farClip / (farClip - nearClip);
-    proj.a[2][3] = -(farClip * nearClip) / (farClip - nearClip);
-    proj.a[3][2] = -1;
+    proj.a[2][2] = (farClip + nearClip) / (nearClip - farClip);
+    proj.a[2][3] = -1;
+    proj.a[3][2] = 2 * (farClip * nearClip) / (nearClip - farClip);
     proj.a[3][3] = 0;
 
     float colour[] = { 1.0f, 1.0f, 0.0f };

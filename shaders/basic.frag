@@ -9,8 +9,8 @@ uniform vec3 colour;
 
 void main()
 {
-    vec3 lightPosition = vec3(5.0, 0.5, -5.0);
-    vec3 lightDir = normalize(position - lightPosition);
+    vec3 lightPosition = vec3(2.0, 1.0, 4.0);
+    vec3 lightDir = normalize(lightPosition - position);
     float lightIntensity = max(0.0, dot(normal, lightDir));
     fragColour = vec4(colour * lightIntensity, 1.0);
 }

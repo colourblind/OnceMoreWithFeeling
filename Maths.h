@@ -10,6 +10,51 @@ namespace OnceMoreWithFeeling
 
         Vector() : x(0), y(0), z(0), w(0) { }
         Vector(float ax, float ay, float az) : x(ax), y(ay), z(az), w(1) { }
+
+        Vector inline operator *(float scale)
+        {
+            Vector v;
+            v.x = x * scale;
+            v.y = y * scale;
+            v.z = z * scale;
+            return v;
+        }
+
+        Vector inline operator +(Vector b)
+        {
+            return Vector(x + b.x, y + b.y, z + b.z);
+        }
+
+        Vector inline operator -(Vector b)
+        {
+            return Vector(x - b.x, y - b.y, z - b.z);
+        }
+
+        static Vector Cross(Vector a, Vector b)
+        {
+            return Vector(
+                a.y * b.z - a.z * b.y,
+                a.z * b.x - a.x * b.z,
+                a.x * b.y - a.y * b.x
+            );
+        }
+
+        static float Dot(Vector a, Vector b)
+        {
+            return a.x * b.x + a.y * b.y + a.z * b.z;
+        }
+
+        Vector Normalise()
+        {
+            float length = ::sqrtf(x * x + y * y + z * z);
+            if (length != 0)
+            {
+                x /= length;
+                y /= length;
+                z /= length;
+            }
+            return *this;
+        }
     };
 
     struct Matrix
@@ -262,7 +307,7 @@ namespace OnceMoreWithFeeling
             Matrix m = Matrix(*this);
             m *= scale;
             return m;
-        };
+        }
 
         void inline operator *=(float scale)
         {
@@ -384,7 +429,7 @@ namespace OnceMoreWithFeeling
             m = mx * my * mz;
 
             return m;
-        };
+        }
 
         static Matrix Scale(float s)
         {
@@ -399,7 +444,7 @@ namespace OnceMoreWithFeeling
             m.a[2][2] = z;
             m.a[3][3] = 1.0;
             return m;
-        };
+        }
 
         static Matrix Translate(float x, float y, float z)
         {
@@ -409,7 +454,7 @@ namespace OnceMoreWithFeeling
             m.a[3][2] = z;
             m.a[3][3] = 1.0;
             return m;
-        };
+        }
 
         static Matrix Translate(Vector v)
         {
@@ -421,7 +466,34 @@ namespace OnceMoreWithFeeling
             return m;
         }
 
+        static Matrix Camera(Vector eye, Vector target)
+        {
+            Vector up = Vector(0, 1, 0);
+            Vector zaxis = (target - eye).Normalise();
+            Vector xaxis = Vector::Cross(up, zaxis).Normalise();
+            Vector yaxis = Vector::Cross(zaxis, xaxis).Normalise();
+
+            Matrix m;
+            m.a[0][0] = -xaxis.x;
+            m.a[0][1] = xaxis.y;
+            m.a[0][2] = xaxis.z;
+            m.a[0][3] = 0;
+            m.a[1][0] = yaxis.x;
+            m.a[1][1] = yaxis.y;
+            m.a[1][2] = yaxis.z;
+            m.a[1][3] = 0;
+            m.a[2][0] = zaxis.x;
+            m.a[2][1] = zaxis.y;
+            m.a[2][2] = -zaxis.z;
+            m.a[2][3] = 0;
+            m.a[3][0] = 0;
+            m.a[3][1] = 0;
+            m.a[3][2] = 0;
+            m.a[3][3] = 1;
+
+            return m * Matrix::Translate(eye * -1);
+        }
+
         float a[4][4];		// Columns, Rows
     };
-
 }
