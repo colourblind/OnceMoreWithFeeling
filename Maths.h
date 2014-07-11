@@ -494,6 +494,31 @@ namespace OnceMoreWithFeeling
             return m * Matrix::Translate(eye * -1);
         }
 
+        static Matrix Projection(float nearClip, float farClip, float aspectRatio, float fov)
+        {
+            Matrix m;
+            float s = 1.f / tan(fov / 2);
+            m.a[0][0] = aspectRatio * s;
+            m.a[1][1] = s;
+            m.a[2][2] = (farClip + nearClip) / (nearClip - farClip);
+            m.a[2][3] = -1;
+            m.a[3][2] = 2 * (farClip * nearClip) / (nearClip - farClip);
+            m.a[3][3] = 0;
+            return m;
+        }
+
+        static Matrix Ortho(float width, float height)
+        {
+            Matrix m;
+            m.a[0][0] = 2.f / width;
+            m.a[1][1] = 2.f / height;
+            m.a[2][2] = -1; // -2 / (far - near)
+            m.a[3][0] = -1; // -(right + left) / (right - left)
+            m.a[3][1] = -1; // -(top + bottom) / (top - bottom)
+            m.a[3][2] = 0; // (far + near) / (far - near);
+            return m;
+        }
+
         float a[4][4];		// Columns, Rows
     };
 }
