@@ -85,6 +85,7 @@ void Renderer::Render()
     textProgram->Activate();
 
     GLint t = glGetUniformLocation(textProgram->Handle(), "texture");
+    colour[0] = colour[1] = colour[2] = 1;
 
     Matrix identity;
     glUniformMatrix4fv(m, 1, GL_FALSE, identity.gl());
@@ -96,9 +97,13 @@ void Renderer::Render()
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, font_.GetTexture());
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_DEPTH_TEST);
 
     o.Draw();
+
+    glDisable(GL_BLEND);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 }
