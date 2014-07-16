@@ -4,8 +4,8 @@
 
 namespace OnceMoreWithFeeling
 {
-    unsigned int FONT_WIDTH = { 256 };
-    unsigned int FONT_HEIGHT = { 256 };
+    unsigned int FONT_WIDTH = 256;
+    unsigned int FONT_HEIGHT = 256;
 
     Glyph FONT_DATA[96] = {
         Glyph(0, 29, 9, 0),
