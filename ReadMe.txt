@@ -1,5 +1,8 @@
-Useful camera
-Text
+An attempt to write a graphics library in modern C++ and OpenGL, without a
+load of dependencies, and without falling down the framework rabbit-hole.
+
+TODO
+
 Specular
 Fog?
 Normal mapping?
