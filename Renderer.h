@@ -7,6 +7,7 @@
 
 #include "ShaderProgram.h"
 #include "Objects.h"
+#include "Fonts.h"
 
 namespace OnceMoreWithFeeling
 {
@@ -27,5 +28,6 @@ namespace OnceMoreWithFeeling
         std::vector<std::shared_ptr<Object>> objects_;
         unsigned int width_;
         unsigned int height_;
+        Font font_;
     };
 }

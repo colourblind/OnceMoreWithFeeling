@@ -84,6 +84,8 @@ copy $(ProjectDir)Lib\glew32.dll $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="FontData.h" />
+    <ClInclude Include="Fonts.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="Objects.h" />
     <ClInclude Include="Renderer.h" />
@@ -91,6 +93,7 @@ copy $(ProjectDir)Lib\glew32.dll $(OutDir)</Command>
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Fonts.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Objects.cpp" />
     <ClCompile Include="Renderer.cpp" />

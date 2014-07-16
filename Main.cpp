@@ -88,8 +88,8 @@ void BuildWorld(shared_ptr<Renderer> renderer)
     shared_ptr<Buffer> vertexBuffer = make_shared<Buffer>();
     shared_ptr<Buffer> normalBuffer = make_shared<Buffer>();
     
-    vertexBuffer->SetData(cubeVerts, 24);
-    normalBuffer->SetData(cubeNormals, 24);
+    vertexBuffer->SetData(cubeVerts, 72);
+    normalBuffer->SetData(cubeNormals, 72);
 
     shared_ptr<Object> object = make_shared<Object>();
     object->AttachBuffer(0, vertexBuffer);

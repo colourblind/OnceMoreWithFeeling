@@ -1,6 +1,8 @@
 #include "Renderer.h"
 #include "Maths.h"
 
+#include <sstream>
+
 using namespace OnceMoreWithFeeling;
 using namespace std;
  
@@ -12,9 +14,9 @@ Vector cameraPos(0, 0, 6);
 Vector cameraLookat;
 Vector objectPos;
 
-Renderer::Renderer()
+Renderer::Renderer() : font_()
 {
-
+    AddShader("text", "text");
 }
 
 Renderer::~Renderer()
@@ -62,6 +64,43 @@ void Renderer::Render()
     {
         (*iter)->Draw();
     }
+
+    vector<float> verts;
+    vector<float> texCoords;
+
+    stringstream ss;
+    ss << "test: " << objectPos.x;
+    font_.GetString(ss.str(), verts, texCoords);
+
+    shared_ptr<Buffer> textVerts, textTexCoords;
+    textVerts = make_shared<Buffer>();
+    textVerts->SetData(verts);
+    textTexCoords = make_shared<Buffer>();
+    textTexCoords->SetData(texCoords);
+    Object o;
+    o.AttachBuffer(0, textVerts, 2);
+    o.AttachBuffer(1, textTexCoords, 2);
+
+    shared_ptr<ShaderProgram> textProgram = shaders_["text|text"];
+    textProgram->Activate();
+
+    GLint t = glGetUniformLocation(textProgram->Handle(), "texture");
+
+    Matrix identity;
+    glUniformMatrix4fv(m, 1, GL_FALSE, identity.gl());
+    glUniformMatrix4fv(v, 1, GL_FALSE, identity.gl());
+    glUniformMatrix4fv(p, 1, GL_FALSE, Matrix::Ortho(static_cast<float>(width_), static_cast<float>(height_)).gl());
+    glUniform1i(t, 0);
+    glUniform3fv(c, 1, colour);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, font_.GetTexture());
+
+    glDisable(GL_DEPTH_TEST);
+
+    o.Draw();
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Renderer::AddShader(string vertexShaderName, string fragmentShaderName)

@@ -15,6 +15,7 @@ namespace OnceMoreWithFeeling
         ~Buffer();
 
         void SetData(float *data, unsigned int count);
+        void SetData(std::vector<float> &data);
         unsigned int GetSize() { return count_; }
 
         void Activate() { glBindBuffer(GL_ARRAY_BUFFER, bufferObject_); }
@@ -36,7 +37,7 @@ namespace OnceMoreWithFeeling
         void Activate() { glBindVertexArray(arrayObject_); }
         static void Deactivate() { glBindVertexArray(0); }
 
-        void AttachBuffer(int attribLocation, std::shared_ptr<Buffer> buffer);
+        void AttachBuffer(int attribLocation, std::shared_ptr<Buffer> buffer, unsigned int size = 3);
 
     protected:
         std::vector<std::shared_ptr<Buffer>> buffers_;

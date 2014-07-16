@@ -20,12 +20,12 @@ void Object::Draw()
     Deactivate();
 }
 
-void Object::AttachBuffer(int attribLocation, shared_ptr<Buffer> buffer)
+void Object::AttachBuffer(int attribLocation, shared_ptr<Buffer> buffer, unsigned int size)
 {
     Activate();
     buffer->Activate();
     glEnableVertexAttribArray(attribLocation);
-    glVertexAttribPointer(attribLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(attribLocation, size, GL_FLOAT, GL_FALSE, 0, 0);
     buffer->Deactivate();
     Deactivate();
     count_ = buffer->GetSize();
@@ -46,7 +46,12 @@ Buffer::~Buffer()
 void Buffer::SetData(float *data, unsigned int count)
 {
     Activate();
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * count * 3, data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * count, data, GL_STATIC_DRAW);
     Deactivate();
     count_ = count;
+}
+
+void Buffer::SetData(vector<float> &data)
+{
+    SetData(&data[0], data.size());
 }
