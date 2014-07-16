@@ -25,7 +25,7 @@ Renderer::~Renderer()
         glDeleteProgram(iter->second->Handle());
 }
 
-void Renderer::Render()
+void Renderer::Render(float msecs)
 {
     shared_ptr<ShaderProgram> basicProgram = shaders_["basic|basic"];
     basicProgram->Activate();
@@ -35,9 +35,11 @@ void Renderer::Render()
     float farClip = 20;
     float fov = PI / 3;
 
-    //rot += 0.0001f;
+    rot -= 0.001f * msecs;
     //cameraPos.x += 0.0005f;
-    objectPos.x += 0.0005f;
+    //objectPos.x += 0.0001f * msecs;
+    if (rot < 0)
+        rot += PI * 2;
 
     Matrix model = Matrix::Translate(objectPos) * Matrix::Rotate(0, rot, 0);
     Matrix view = Matrix::Camera(cameraPos, cameraLookat);
@@ -69,7 +71,7 @@ void Renderer::Render()
     vector<float> texCoords;
 
     stringstream ss;
-    ss << "test: " << objectPos.x;
+    ss << "test: " << rot;
     font_.GetString(ss.str(), verts, texCoords);
 
     shared_ptr<Buffer> textVerts, textTexCoords;
@@ -84,7 +86,10 @@ void Renderer::Render()
     shared_ptr<ShaderProgram> textProgram = shaders_["text|text"];
     textProgram->Activate();
 
-    GLint t = glGetUniformLocation(textProgram->Handle(), "texture");
+    m = glGetUniformLocation(textProgram->Handle(), "m");
+    v = glGetUniformLocation(textProgram->Handle(), "v");
+    p = glGetUniformLocation(textProgram->Handle(), "p");
+    GLint t = glGetUniformLocation(textProgram->Handle(), "font");
     colour[0] = colour[1] = colour[2] = 1;
 
     Matrix identity;
@@ -92,6 +97,7 @@ void Renderer::Render()
     glUniformMatrix4fv(v, 1, GL_FALSE, identity.gl());
     glUniformMatrix4fv(p, 1, GL_FALSE, Matrix::Ortho(static_cast<float>(width_), static_cast<float>(height_)).gl());
     glUniform1i(t, 0);
+    c = glGetUniformLocation(textProgram->Handle(), "colour");
     glUniform3fv(c, 1, colour);
 
     glActiveTexture(GL_TEXTURE0);

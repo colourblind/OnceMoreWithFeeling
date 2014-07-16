@@ -17,7 +17,7 @@ namespace OnceMoreWithFeeling
         Renderer();
         ~Renderer();
 
-        void Render();
+        void Render(float msecs);
         
         void AddShader(std::string vertexShaderName, std::string fragmentShaderName);
         void AddObject(std::shared_ptr<Object> object) { objects_.push_back(object); }

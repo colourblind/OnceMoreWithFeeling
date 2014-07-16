@@ -93,7 +93,7 @@ Window::Window(HINSTANCE instance, int show) : width_(640), height_(480)
             0
         };
         
-        renderContext_ = ::wglCreateContextAttribsARB(deviceContext_, nullptr, attributes); // Create and OpenGL 3.x context based on the given attributes  
+        renderContext_ = ::wglCreateContextAttribsARB(deviceContext_, nullptr, attributes);
         ::wglMakeCurrent(nullptr, nullptr);
         ::wglDeleteContext(tempGlContext);
         ::wglMakeCurrent(deviceContext_, renderContext_);
@@ -116,6 +116,11 @@ int Window::Loop(shared_ptr<Renderer> renderer)
     renderer->AddShader("basic", "basic");
     renderer->SetWindowSize(width_, height_);
 
+    LARGE_INTEGER freq, counter, last;
+    ::QueryPerformanceFrequency(&freq);
+    ::QueryPerformanceCounter(&last);
+    float toMsecs = 1000.f / freq.QuadPart;
+
     // Main message loop:
     MSG msg;
     while (true)
@@ -127,8 +132,14 @@ int Window::Loop(shared_ptr<Renderer> renderer)
             ::TranslateMessage(&msg);
             ::DispatchMessage(&msg);
         }
-        renderer->Render();
-        ::SwapBuffers(deviceContext_);
+        else
+        {
+            ::QueryPerformanceCounter(&counter);
+            float msecs = (counter.QuadPart - last.QuadPart) * toMsecs;
+            last = counter;
+            renderer->Render(msecs);
+            ::SwapBuffers(deviceContext_);
+        }
     }
 
     return static_cast<int>(msg.wParam);
