@@ -1,17 +1,6 @@
 import sys
 
-def get_normal(v0, v1, v2):
-    # get two vectors on the plane
-    p0 = [v1[0] - v0[0], v1[1] - v0[1], v1[2] - v0[2]]
-    p1 = [v2[0] - v0[0], v2[1] - v0[1], v2[2] - v0[2]]
-    # cross product
-    r = [0, 0, 0]
-    r[0] = p0[1] * p1[2] - p0[2] * p1[1]
-    r[1] = p0[2] * p1[0] - p0[0] * p1[2]
-    r[2] = p0[0] * p1[1] - p0[1] * p1[0]
-    return r
-
-def create(infile, outfile):
+def create(infile, outfile, name_prefix):
     # read in data
     verts = []
     normals = []
@@ -21,25 +10,37 @@ def create(infile, outfile):
             v = map(lambda x: x + 'f', filter(lambda x: len(x) > 0, line[2:].replace('\n', '').split(' ')))
             verts.append(v)
         elif line.startswith('vn '):
-            vn = filter(lambda x: len(x) > 0, line[3:].replace('\n', '').split(' '))
+            vn = map(lambda x: x + 'f', filter(lambda x: len(x) > 0, line[3:].replace('\n', '').split(' ')))
             normals.append(vn)
         elif line.startswith('f '):
-            f = map(lambda x: int(x) - 1, filter(lambda x: len(x) > 0, line[2:].replace('\n', '').split(' ')))
+            f = line[2:].replace('\n', '').split(' ')
             faces.append(f)
             
+    num_elements = len(faces) * 9
+            
     # spit verts back out
+    outfile.write('// Verts\n')
+    outfile.write('float {0}_verts[{1}] = {{\n'.format(name_prefix, num_elements))
     print(len(verts))
     for f in faces:
-        outfile.write('{0}, {1}, {2},\n'.format(', '.join(verts[f[0]]), ', '.join(verts[f[1]]), ', '.join(verts[f[2]])))
+        index = map(lambda x: int(x.split('/')[0]) - 1, f)
+        outfile.write('    {0}, {1}, {2},\n'.format(', '.join(verts[index[0]]), ', '.join(verts[index[1]]), ', '.join(verts[index[2]])))
+    outfile.write('};\n\n')
         
     # and then normals
+    outfile.write('// Normals\n')
+    outfile.write('float {0}_normals[{1}] = {{\n'.format(name_prefix, num_elements))
+    for f in faces:
+        index = map(lambda x: int(x.split('/')[2]) - 1, f)
+        outfile.write('    {0}, {1}, {2},\n'.format(', '.join(normals[index[0]]), ', '.join(normals[index[1]]), ', '.join(normals[index[2]])))
+    outfile.write('};\n\n')
     
 
 if __name__ == '__main__':
     print(sys.argv[1])
     infile = open(sys.argv[1], 'r')
     outfile = open(sys.argv[1] + '.h', 'w')
-    create(infile, outfile)
+    create(infile, outfile, sys.argv[2])
     infile.close()
     outfile.close()
 

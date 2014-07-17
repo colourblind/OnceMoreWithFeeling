@@ -3,11 +3,12 @@ load of dependencies, and without falling down the framework rabbit-hole.
 
 TODO
 
-Specular
 Fog?
 Normal mapping?
+Gloss mapping?
 post-processing
     Glows
     Anti-aliasing
     Depth of field
     Bokeh?
+    Tone mapping?

@@ -10,8 +10,8 @@ float PI = 3.14159265359f;
 
 float rot = 0;
 
-Vector cameraPos(0, 0, 4);
-Vector cameraLookat;
+Vector cameraPos(0, 0.5, 2);
+Vector cameraLookat(0, 0.5, 0);
 Vector objectPos;
 
 Renderer::Renderer() : font_()

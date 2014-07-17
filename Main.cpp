@@ -83,6 +83,8 @@ float planeNormals[] = {
     0, 0, -1,
 };
 
+#include "wt_teapot.obj.h"
+
 void BuildWorld(shared_ptr<Renderer> renderer)
 {
     shared_ptr<Buffer> vertexBuffer = make_shared<Buffer>();
@@ -95,7 +97,19 @@ void BuildWorld(shared_ptr<Renderer> renderer)
     object->AttachBuffer(0, vertexBuffer);
     object->AttachBuffer(1, normalBuffer);
 
-    renderer->AddObject(object);
+    //renderer->AddObject(object);
+
+    shared_ptr<Buffer> teapotVertexBuffer = make_shared<Buffer>();
+    shared_ptr<Buffer> teapotNormalBuffer = make_shared<Buffer>();
+
+    teapotVertexBuffer->SetData(teapot_verts, 22176);
+    teapotNormalBuffer->SetData(teapot_normals, 22176);
+
+    shared_ptr<Object> teapot = make_shared<Object>();
+    teapot->AttachBuffer(0, teapotVertexBuffer);
+    teapot->AttachBuffer(1, teapotNormalBuffer);
+
+    renderer->AddObject(teapot);
 }
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev, LPSTR commandLine, int show)
