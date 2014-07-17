@@ -22,6 +22,7 @@ namespace OnceMoreWithFeeling
         void AddShader(std::string vertexShaderName, std::string fragmentShaderName);
         void AddObject(std::shared_ptr<Object> object) { objects_.push_back(object); }
         void SetWindowSize(unsigned int width, unsigned int height);
+        void ResetFrameCount() { fps_ = frameCount_; frameCount_ = 0; }
 
     protected:
         std::unordered_map<std::string, std::shared_ptr<ShaderProgram>> shaders_;
@@ -29,5 +30,7 @@ namespace OnceMoreWithFeeling
         unsigned int width_;
         unsigned int height_;
         Font font_;
+        unsigned int frameCount_;
+        unsigned int fps_;
     };
 }

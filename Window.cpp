@@ -120,6 +120,7 @@ int Window::Loop(shared_ptr<Renderer> renderer)
     ::QueryPerformanceFrequency(&freq);
     ::QueryPerformanceCounter(&last);
     float toMsecs = 1000.f / freq.QuadPart;
+    float msecCounter = 0;
 
     // Main message loop:
     MSG msg;
@@ -139,6 +140,13 @@ int Window::Loop(shared_ptr<Renderer> renderer)
             last = counter;
             renderer->Render(msecs);
             ::SwapBuffers(deviceContext_);
+
+            msecCounter += msecs;
+            if (msecCounter > 1000)
+            {
+                renderer->ResetFrameCount();
+                msecCounter -= 1000;
+            }
         }
     }
 

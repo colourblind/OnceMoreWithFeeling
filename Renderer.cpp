@@ -14,7 +14,7 @@ Vector cameraPos(0, 0.5, 2);
 Vector cameraLookat(0, 0.5, 0);
 Vector objectPos;
 
-Renderer::Renderer() : font_()
+Renderer::Renderer() : font_(), frameCount_(0), fps_(0)
 {
     AddShader("text", "text");
 }
@@ -74,7 +74,7 @@ void Renderer::Render(float msecs)
     vector<float> texCoords;
 
     stringstream ss;
-    ss << "test: " << rot;
+    ss << "fps: " << fps_;
     font_.GetString(ss.str(), verts, texCoords);
 
     shared_ptr<Buffer> textVerts, textTexCoords;
@@ -97,7 +97,7 @@ void Renderer::Render(float msecs)
 
     Matrix identity;
     glUniformMatrix4fv(m, 1, GL_FALSE, identity.gl());
-    glUniformMatrix4fv(v, 1, GL_FALSE, identity.gl());
+    glUniformMatrix4fv(v, 1, GL_FALSE, Matrix::Translate(0, 30, 0).gl());
     glUniformMatrix4fv(p, 1, GL_FALSE, Matrix::Ortho(static_cast<float>(width_), static_cast<float>(height_)).gl());
     glUniform1i(t, 0);
     c = glGetUniformLocation(textProgram->Handle(), "colour");
@@ -115,6 +115,8 @@ void Renderer::Render(float msecs)
     glDisable(GL_BLEND);
 
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    frameCount_++;
 }
 
 void Renderer::AddShader(string vertexShaderName, string fragmentShaderName)

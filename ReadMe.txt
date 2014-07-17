@@ -1,6 +1,10 @@
 An attempt to write a graphics library in modern C++ and OpenGL, without a
 load of dependencies, and without falling down the framework rabbit-hole.
 
+BUGS
+
+Fix font rendering (needs baseline offset in font data for 'p', 'g', etc.
+
 TODO
 
 Fog?
