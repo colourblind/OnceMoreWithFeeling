@@ -30,6 +30,11 @@ namespace OnceMoreWithFeeling
             return Vector(x - b.x, y - b.y, z - b.z);
         }
 
+        float *gl()
+        {
+            return &x;
+        }
+
         static Vector Cross(Vector a, Vector b)
         {
             return Vector(

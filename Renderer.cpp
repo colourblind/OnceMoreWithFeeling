@@ -10,7 +10,7 @@ float PI = 3.14159265359f;
 
 float rot = 0;
 
-Vector cameraPos(0, 0, 6);
+Vector cameraPos(0, 0, 4);
 Vector cameraLookat;
 Vector objectPos;
 
@@ -31,7 +31,7 @@ void Renderer::Render(float msecs)
     basicProgram->Activate();
 
     float aspectRatio = static_cast<float>(height_) / width_;
-    float nearClip = 1;
+    float nearClip = 0.1f;
     float farClip = 20;
     float fov = PI / 3;
 
@@ -51,14 +51,17 @@ void Renderer::Render(float msecs)
     GLint v = glGetUniformLocation(basicProgram->Handle(), "v");
     GLint p = glGetUniformLocation(basicProgram->Handle(), "p");
     GLint c = glGetUniformLocation(basicProgram->Handle(), "colour");
+    GLint s = glGetUniformLocation(basicProgram->Handle(), "shininess");
+    GLint e = glGetUniformLocation(basicProgram->Handle(), "eyePosition");
 
     glUniformMatrix4fv(m, 1, GL_FALSE, model.gl());
     glUniformMatrix4fv(v, 1, GL_FALSE, view.gl());
     glUniformMatrix4fv(p, 1, GL_FALSE, proj.gl());
     glUniform3fv(c, 1, colour);
+    glUniform3fv(e, 1, cameraPos.gl());
+    glUniform1f(s, 128);
 
     glEnable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.4f, 0.6f, 0.9f, 0.0f);
 
