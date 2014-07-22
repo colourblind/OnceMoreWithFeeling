@@ -96,8 +96,8 @@ void Renderer::Render(float msecs)
     colour[0] = colour[1] = colour[2] = 1;
 
     Matrix identity;
-    glUniformMatrix4fv(m, 1, GL_FALSE, identity.gl());
-    glUniformMatrix4fv(v, 1, GL_FALSE, Matrix::Translate(0, 30, 0).gl());
+    glUniformMatrix4fv(m, 1, GL_FALSE, Matrix::Translate(0, 5, 0).gl());
+    glUniformMatrix4fv(v, 1, GL_FALSE, identity.gl());
     glUniformMatrix4fv(p, 1, GL_FALSE, Matrix::Ortho(static_cast<float>(width_), static_cast<float>(height_)).gl());
     glUniform1i(t, 0);
     c = glGetUniformLocation(textProgram->Handle(), "colour");

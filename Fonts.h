@@ -12,8 +12,9 @@ namespace OnceMoreWithFeeling
         float yoffset;
         float width;
         float height;
+        float baseline;
         
-        Glyph(float x, float y, float w, float h) : xoffset(x), yoffset(y), width(w), height(h) { }
+        Glyph(float x, float y, float w, float h, float b) : xoffset(x), yoffset(y), width(w), height(h), baseline(b) { }
     };
 
     class Font

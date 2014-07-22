@@ -27,13 +27,14 @@ void Font::GetString(string s, vector<float> &verts, vector<float> &texCoords)
         unsigned short i = static_cast<short>(*iter) - 32;
         Glyph g = glyphs_[i];
 
+        float foot = FONT_SIZE - g.height - g.baseline;
         float v[12] = {
-            advance, 0,
-            advance + g.width, 0,
-            advance, g.height,
-            advance + g.width, 0,
-            advance + g.width, g.height,
-            advance, g.height
+            advance, foot,
+            advance + g.width, foot,
+            advance, foot + g.height,
+            advance + g.width, foot,
+            advance + g.width, foot + g.height,
+            advance, foot + g.height
         };
         verts.insert(end(verts), v, v + 12);
 

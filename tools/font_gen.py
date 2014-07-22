@@ -1,8 +1,8 @@
 from PIL import Image, ImageFont, ImageDraw
 
-FONT_HEIGHT = 32
+FONT_SIZE = 32
 
-font = ImageFont.truetype('arial.ttf', FONT_HEIGHT)
+font = ImageFont.truetype('arial.ttf', FONT_SIZE)
 print(font)
 
 image = Image.new('L', (256, 256))
@@ -18,25 +18,28 @@ f.write('#include "Fonts.h"\n')
 f.write('\n')
 f.write('namespace OnceMoreWithFeeling\n')
 f.write('{\n')
+f.write('    unsigned int FONT_SIZE = {0};\n'.format(FONT_SIZE))
 f.write('    unsigned int FONT_WIDTH = {0};\n'.format(256))
 f.write('    unsigned int FONT_HEIGHT = {0};\n'.format(256))
 f.write('\n')
 f.write('    Glyph FONT_DATA[96] = {\n')
 
+lolwut = ''
 for i in range(32, 128):
     c = str(chr(i))
     s = font.getsize(c)
     
     # the whole FreeTypeFont.getoffset thing does seem to be particularly 
-    # documented. Hopefully if doesn't go away
+    # documented. Hopefully if doesn't go away. Also offset doesn't seem to 
+    # be rooted at 0.
     offset = font.getoffset(c)
     
     if x + s[0] > 256:
-        y += FONT_HEIGHT
+        y += FONT_SIZE
         x = 0
 
     draw.text((x, y), c, font=font, fill=255)
-    f.write('        Glyph({0}, {1}, {2}, {3}){4}\n'.format(x, y + offset[1], s[0], s[1], ',' if i < 127 else ''))
+    f.write('        Glyph({0}, {1}, {2}, {3}, {4}){5}\n'.format(x, y + offset[1], s[0], s[1], offset[1], ',' if i < 127 else ''))
     
     x += s[0]
     
