@@ -1,12 +1,9 @@
 #include "Renderer.h"
-#include "Maths.h"
 
 #include <sstream>
 
 using namespace OnceMoreWithFeeling;
 using namespace std;
- 
-float PI = 3.14159265359f;
 
 float rot = 0;
 
@@ -25,51 +22,26 @@ Renderer::~Renderer()
         glDeleteProgram(iter->second->Handle());
 }
 
-void Renderer::Render(float msecs)
+void Renderer::StartFrame()
 {
-    shared_ptr<ShaderProgram> basicProgram = shaders_["basic|basic"];
-    basicProgram->Activate();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, width_, height_);
+    glEnable(GL_DEPTH_TEST);
+    glCullFace(GL_BACK);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.4f, 0.6f, 0.9f, 0.0f);
 
     float aspectRatio = static_cast<float>(height_) / width_;
     float nearClip = 0.1f;
     float farClip = 20;
     float fov = PI / 3;
 
-    rot -= 0.001f * msecs;
-    //cameraPos.x += 0.0005f;
-    //objectPos.x += 0.0001f * msecs;
-    if (rot < 0)
-        rot += PI * 2;
+    view_ = Matrix::Camera(cameraPos, cameraLookat);
+    projection_ = Matrix::Projection(nearClip, farClip, aspectRatio, fov);
+}
 
-    Matrix model = Matrix::Translate(objectPos) * Matrix::Rotate(0, rot, 0);
-    Matrix view = Matrix::Camera(cameraPos, cameraLookat);
-    Matrix proj = Matrix::Projection(nearClip, farClip, aspectRatio, fov);
-    
-    float colour[] = { 1.0f, 1.0f, 0.0f };
-    
-    GLint m = glGetUniformLocation(basicProgram->Handle(), "m");
-    GLint v = glGetUniformLocation(basicProgram->Handle(), "v");
-    GLint p = glGetUniformLocation(basicProgram->Handle(), "p");
-    GLint c = glGetUniformLocation(basicProgram->Handle(), "colour");
-    GLint s = glGetUniformLocation(basicProgram->Handle(), "shininess");
-    GLint e = glGetUniformLocation(basicProgram->Handle(), "eyePosition");
-
-    glUniformMatrix4fv(m, 1, GL_FALSE, model.gl());
-    glUniformMatrix4fv(v, 1, GL_FALSE, view.gl());
-    glUniformMatrix4fv(p, 1, GL_FALSE, proj.gl());
-    glUniform3fv(c, 1, colour);
-    glUniform3fv(e, 1, cameraPos.gl());
-    glUniform1f(s, 128);
-
-    glEnable(GL_DEPTH_TEST);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.4f, 0.6f, 0.9f, 0.0f);
-
-    for (auto iter = begin(objects_); iter != end(objects_); ++iter)
-    {
-        (*iter)->Draw();
-    }
-
+void Renderer::EndFrame()
+{
     vector<float> verts;
     vector<float> texCoords;
 
@@ -89,18 +61,18 @@ void Renderer::Render(float msecs)
     shared_ptr<ShaderProgram> textProgram = shaders_["text|text"];
     textProgram->Activate();
 
-    m = glGetUniformLocation(textProgram->Handle(), "m");
-    v = glGetUniformLocation(textProgram->Handle(), "v");
-    p = glGetUniformLocation(textProgram->Handle(), "p");
+    GLint m = glGetUniformLocation(textProgram->Handle(), "m");
+    GLint v = glGetUniformLocation(textProgram->Handle(), "v");
+    GLint p = glGetUniformLocation(textProgram->Handle(), "p");
     GLint t = glGetUniformLocation(textProgram->Handle(), "font");
-    colour[0] = colour[1] = colour[2] = 1;
+    float colour[] = { 1.f, 1.f, 1.f };
 
     Matrix identity;
     glUniformMatrix4fv(m, 1, GL_FALSE, Matrix::Translate(0, 5, 0).gl());
     glUniformMatrix4fv(v, 1, GL_FALSE, identity.gl());
     glUniformMatrix4fv(p, 1, GL_FALSE, Matrix::Ortho(static_cast<float>(width_), static_cast<float>(height_)).gl());
     glUniform1i(t, 0);
-    c = glGetUniformLocation(textProgram->Handle(), "colour");
+    GLint c = glGetUniformLocation(textProgram->Handle(), "colour");
     glUniform3fv(c, 1, colour);
 
     glActiveTexture(GL_TEXTURE0);
@@ -117,6 +89,52 @@ void Renderer::Render(float msecs)
     glBindTexture(GL_TEXTURE_2D, 0);
 
     frameCount_++;
+}
+
+void Renderer::Draw(shared_ptr<RenderObject> renderObject)
+{
+    shared_ptr<ShaderProgram> program = shaders_[renderObject->program];
+    program->Activate();
+
+    GLint m = glGetUniformLocation(program->Handle(), "m");
+    GLint v = glGetUniformLocation(program->Handle(), "v");
+    GLint p = glGetUniformLocation(program->Handle(), "p");
+    GLint c = glGetUniformLocation(program->Handle(), "colour");
+    GLint s = glGetUniformLocation(program->Handle(), "shininess");
+    GLint e = glGetUniformLocation(program->Handle(), "eyePosition");
+
+    glUniformMatrix4fv(m, 1, GL_FALSE, renderObject->transformation.gl());
+    glUniformMatrix4fv(v, 1, GL_FALSE, view_.gl());
+    glUniformMatrix4fv(p, 1, GL_FALSE, projection_.gl());
+    glUniform3fv(c, 1, renderObject->colour);
+    glUniform1f(s, renderObject->shininess);
+    glUniform3fv(e, 1, cameraPos.gl());
+
+    renderObject->object->Draw();
+}
+
+void Renderer::Render(float msecs)
+{
+    StartFrame();
+
+    shared_ptr<ShaderProgram> basicProgram = shaders_["basic|basic"];
+    basicProgram->Activate();
+
+    rot -= 0.001f * msecs;
+    //cameraPos.x += 0.0005f;
+    //objectPos.x += 0.0001f * msecs;
+    if (rot < 0)
+        rot += PI * 2;
+
+    Matrix model = Matrix::Translate(objectPos) * Matrix::Rotate(0, rot, 0);
+    
+    for (auto iter : objects_)
+    {
+        iter->transformation = model;
+        Draw(iter);
+    }
+
+    EndFrame();
 }
 
 void Renderer::AddShader(string vertexShaderName, string fragmentShaderName)

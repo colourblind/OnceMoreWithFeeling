@@ -87,18 +87,6 @@ float planeNormals[] = {
 
 void BuildWorld(shared_ptr<Renderer> renderer)
 {
-    shared_ptr<Buffer> vertexBuffer = make_shared<Buffer>();
-    shared_ptr<Buffer> normalBuffer = make_shared<Buffer>();
-    
-    vertexBuffer->SetData(cubeVerts, 72);
-    normalBuffer->SetData(cubeNormals, 72);
-
-    shared_ptr<Object> object = make_shared<Object>();
-    object->AttachBuffer(0, vertexBuffer);
-    object->AttachBuffer(1, normalBuffer);
-
-    //renderer->AddObject(object);
-
     shared_ptr<Buffer> teapotVertexBuffer = make_shared<Buffer>();
     shared_ptr<Buffer> teapotNormalBuffer = make_shared<Buffer>();
 
@@ -109,7 +97,16 @@ void BuildWorld(shared_ptr<Renderer> renderer)
     teapot->AttachBuffer(0, teapotVertexBuffer);
     teapot->AttachBuffer(1, teapotNormalBuffer);
 
-    renderer->AddObject(teapot);
+    shared_ptr<RenderObject> o = make_shared<RenderObject>();
+    o->object = teapot;
+    o->program = "basic|basic";
+    o->colour[0] = 1.f;
+    o->colour[1] = 1.f;
+    o->colour[2] = 0;
+    o->shininess = 128;
+    o->transformation = Matrix::Rotate(0, PI / 6, 0);
+
+    renderer->AddObject(o);
 }
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev, LPSTR commandLine, int show)

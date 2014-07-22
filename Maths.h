@@ -4,6 +4,8 @@
 
 namespace OnceMoreWithFeeling
 {
+    const float PI = 3.14159265359f;
+
     struct Vector
     {
         float x, y, z, w;
