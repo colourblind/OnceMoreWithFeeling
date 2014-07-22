@@ -19,6 +19,7 @@ namespace OnceMoreWithFeeling
         static LRESULT CALLBACK WndProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
 
     protected:
+        static std::shared_ptr<Renderer> renderer_;
         HWND window_;
         HDC deviceContext_;
         HGLRC renderContext_;

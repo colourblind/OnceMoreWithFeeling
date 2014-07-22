@@ -5,6 +5,8 @@
 using namespace OnceMoreWithFeeling;
 using namespace std;
 
+shared_ptr<Renderer> Window::renderer_ = nullptr;
+
 LRESULT CALLBACK Window::WndProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT ps;
@@ -15,6 +17,9 @@ LRESULT CALLBACK Window::WndProc(HWND window, UINT message, WPARAM wParam, LPARA
         case WM_PAINT:
             deviceContext = ::BeginPaint(window, &ps);
             ::EndPaint(window, &ps);
+            break;
+        case WM_SIZE:
+            renderer_->SetWindowSize(LOWORD(lParam), HIWORD(lParam));
             break;
         case WM_DESTROY:
             ::PostQuitMessage(0);
@@ -113,8 +118,9 @@ Window::~Window()
 
 int Window::Loop(shared_ptr<Renderer> renderer)
 {
-    renderer->AddShader("basic", "basic");
-    renderer->SetWindowSize(width_, height_);
+    renderer_ = renderer;
+    renderer_->AddShader("basic", "basic");
+    renderer_->SetWindowSize(width_, height_);
 
     LARGE_INTEGER freq, counter, last;
     ::QueryPerformanceFrequency(&freq);
@@ -138,13 +144,13 @@ int Window::Loop(shared_ptr<Renderer> renderer)
             ::QueryPerformanceCounter(&counter);
             float msecs = (counter.QuadPart - last.QuadPart) * toMsecs;
             last = counter;
-            renderer->Render(msecs);
+            renderer_->Render(msecs);
             ::SwapBuffers(deviceContext_);
 
             msecCounter += msecs;
             if (msecCounter > 1000)
             {
-                renderer->ResetFrameCount();
+                renderer_->ResetFrameCount();
                 msecCounter -= 1000;
             }
         }
