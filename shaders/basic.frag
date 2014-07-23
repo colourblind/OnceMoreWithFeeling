@@ -11,9 +11,8 @@ uniform float shininess;
 
 void main()
 {
-    vec3 lightPosition = vec3(4.0, 1.0, 4.0);
     vec3 n = normalize(normal);
-    vec3 lightDir = normalize(lightPosition - position);
+    vec3 lightDir = normalize(vec3(4.0, 1.0, 4.0));
     
     float diffuse = max(0.0, dot(n, lightDir));
     
