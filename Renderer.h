@@ -29,17 +29,14 @@ namespace OnceMoreWithFeeling
 
         void StartFrame();
         void EndFrame();
-        void Render(float msecs);
         void Draw(std::shared_ptr<RenderObject> renderObject);
         
         void AddShader(std::string vertexShaderName, std::string fragmentShaderName);
-        void AddObject(std::shared_ptr<RenderObject> object) { objects_.push_back(object); }
         void SetWindowSize(unsigned int width, unsigned int height);
         void ResetFrameCount() { fps_ = frameCount_; frameCount_ = 0; }
 
     protected:
         std::unordered_map<std::string, std::shared_ptr<ShaderProgram>> shaders_;
-        std::vector<std::shared_ptr<RenderObject>> objects_;
         unsigned int width_;
         unsigned int height_;
         Font font_;

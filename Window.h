@@ -4,6 +4,7 @@
 #include "glew.h"
 #include <memory>
 
+#include "World.h"
 #include "Renderer.h"
 
 namespace OnceMoreWithFeeling
@@ -15,10 +16,11 @@ namespace OnceMoreWithFeeling
         Window(HINSTANCE instance, int showWindow);
         ~Window();
 
-        int Loop(std::shared_ptr<Renderer> renderer);
+        int Loop(std::shared_ptr<World> world, std::shared_ptr<Renderer> renderer);
         static LRESULT CALLBACK WndProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
 
     protected:
+        std::shared_ptr<World> world_;
         static std::shared_ptr<Renderer> renderer_;
         HWND window_;
         HDC deviceContext_;

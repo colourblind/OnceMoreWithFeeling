@@ -5,11 +5,8 @@
 using namespace OnceMoreWithFeeling;
 using namespace std;
 
-float rot = 0;
-
 Vector cameraPos(0, 0.5, 2);
 Vector cameraLookat(0, 0.5, 0);
-Vector objectPos;
 
 Renderer::Renderer() : font_(), frameCount_(0), fps_(0)
 {
@@ -111,30 +108,6 @@ void Renderer::Draw(shared_ptr<RenderObject> renderObject)
     glUniform3fv(e, 1, cameraPos.gl());
 
     renderObject->object->Draw();
-}
-
-void Renderer::Render(float msecs)
-{
-    StartFrame();
-
-    shared_ptr<ShaderProgram> basicProgram = shaders_["basic|basic"];
-    basicProgram->Activate();
-
-    rot -= 0.001f * msecs;
-    //cameraPos.x += 0.0005f;
-    //objectPos.x += 0.0001f * msecs;
-    if (rot < 0)
-        rot += PI * 2;
-
-    Matrix model = Matrix::Translate(objectPos) * Matrix::Rotate(0, rot, 0);
-    
-    for (auto iter : objects_)
-    {
-        iter->transformation = model;
-        Draw(iter);
-    }
-
-    EndFrame();
 }
 
 void Renderer::AddShader(string vertexShaderName, string fragmentShaderName)

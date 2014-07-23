@@ -116,7 +116,7 @@ Window::~Window()
     ::ReleaseDC(window_, deviceContext_);
 }
 
-int Window::Loop(shared_ptr<Renderer> renderer)
+int Window::Loop(shared_ptr<World> world, shared_ptr<Renderer> renderer)
 {
     renderer_ = renderer;
     renderer_->AddShader("basic", "basic");
@@ -144,7 +144,12 @@ int Window::Loop(shared_ptr<Renderer> renderer)
             ::QueryPerformanceCounter(&counter);
             float msecs = (counter.QuadPart - last.QuadPart) * toMsecs;
             last = counter;
-            renderer_->Render(msecs);
+            world->Upate(msecs);
+
+            renderer_->StartFrame();
+            world->Draw(renderer);
+            renderer_->EndFrame();
+
             ::SwapBuffers(deviceContext_);
 
             msecCounter += msecs;
