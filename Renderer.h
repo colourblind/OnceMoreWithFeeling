@@ -19,6 +19,7 @@ namespace OnceMoreWithFeeling
         Matrix transformation;
         float colour[3];
         float shininess;
+        float reflectiveness;
     };
 
     class Renderer

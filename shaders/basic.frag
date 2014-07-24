@@ -8,6 +8,7 @@ layout(location = 0) out vec4 fragColour;
 uniform vec3 colour;
 uniform vec3 eyePosition;
 uniform float shininess;
+uniform float reflectiveness;
 
 uniform samplerCube environment;
 
@@ -24,5 +25,5 @@ void main()
     float s = dot(lightReflect, eyeVector);
     vec3 specular = vec3(0.5 * pow(max(0.0, s), shininess));
     
-    fragColour = vec4(0.25 * diffuse + 0.75 * reflected + specular, 1.0);
+    fragColour = vec4((1.0 - reflectiveness) * diffuse + reflectiveness * reflected + specular, 1.0);
 }

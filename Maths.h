@@ -528,4 +528,9 @@ namespace OnceMoreWithFeeling
 
         float a[4][4];		// Columns, Rows
     };
+
+    static float RandF(float min, float max)
+    {
+        return (static_cast<float>(rand()) / RAND_MAX) * (max - min) + min;
+    }
 }
