@@ -1,6 +1,10 @@
 An attempt to write a graphics library in modern C++ and OpenGL, without a
 load of dependencies, and without falling down the framework rabbit-hole.
 
+CREDITS
+
+Cube maps stolen from Humus (www.humus.name)
+
 TODO
 
 Un-hack environment mapping
