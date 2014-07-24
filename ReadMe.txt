@@ -3,9 +3,8 @@ load of dependencies, and without falling down the framework rabbit-hole.
 
 TODO
 
-Un-hack scene updates (World object?)
+Un-hack environment mapping
 Shadows
-Environment mapping?
 Fog?
 Normal mapping?
 Gloss mapping?

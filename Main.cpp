@@ -3,6 +3,7 @@
 #include "Window.h"
 #include "Renderer.h"
 #include "World.h"
+#include "Texture.h"
 
 using namespace OnceMoreWithFeeling;
 using namespace std;
@@ -94,9 +95,10 @@ public:
     virtual void Draw(shared_ptr<Renderer> renderer);
 
 private:
-    float rotation_;
+    Vector rotation_;
     Vector position_;
     shared_ptr<RenderObject> teapot_;
+    GLuint cube_;
 };
 
 void TeapotWorld::Init(shared_ptr<Renderer> renderer)
@@ -119,20 +121,34 @@ void TeapotWorld::Init(shared_ptr<Renderer> renderer)
     teapot_->colour[2] = 0;
     teapot_->shininess = 128;
 
-    rotation_ = 0;
+    vector<string> environment = { "posx.jpg", "negx.jpg", "posy.jpg", "negy.jpg", "posz.jpg", "negz.jpg" };
+    cube_ = LoadCubeTexture(environment);
+
+    position_.y = -0.5f;
 }
 
 void TeapotWorld::Upate(float msecs)
 {
-    rotation_ -= 0.001f * msecs;
-    if (rotation_ < 0)
-        rotation_ += PI * 2;
+    rotation_.x -= 0.0002f * msecs;
+    if (rotation_.x < 0)
+        rotation_.x += PI * 2;
 
-    teapot_->transformation = Matrix::Translate(position_) * Matrix::Rotate(0, rotation_, 0);
+    rotation_.y -= 0.001f * msecs;
+    if (rotation_.y < 0)
+        rotation_.y += PI * 2;
+
+    rotation_.z -= 0.0003f * msecs;
+    if (rotation_.z < 0)
+        rotation_.z += PI * 2;
+
+    teapot_->transformation = Matrix::Rotate(rotation_.x, rotation_.y, rotation_.z) * Matrix::Translate(position_);
 }
 
 void TeapotWorld::Draw(shared_ptr<Renderer> renderer)
 {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, cube_);
+
     renderer->Draw(teapot_);
 }
 

@@ -90,6 +90,7 @@ copy $(ProjectDir)Lib\glew32.dll $(OutDir)</Command>
     <ClInclude Include="Objects.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ShaderProgram.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
@@ -99,6 +100,7 @@ copy $(ProjectDir)Lib\glew32.dll $(OutDir)</Command>
     <ClCompile Include="Objects.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>

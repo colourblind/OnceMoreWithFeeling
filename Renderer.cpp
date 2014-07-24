@@ -5,8 +5,8 @@
 using namespace OnceMoreWithFeeling;
 using namespace std;
 
-Vector cameraPos(0, 0.5, 2);
-Vector cameraLookat(0, 0.5, 0);
+Vector cameraPos(0, 0, 2);
+Vector cameraLookat(0, 0, 0);
 
 Renderer::Renderer() : font_(), frameCount_(0), fps_(0)
 {
@@ -99,6 +99,7 @@ void Renderer::Draw(shared_ptr<RenderObject> renderObject)
     GLint c = glGetUniformLocation(program->Handle(), "colour");
     GLint s = glGetUniformLocation(program->Handle(), "shininess");
     GLint e = glGetUniformLocation(program->Handle(), "eyePosition");
+    GLint environment = glGetUniformLocation(program->Handle(), "environment");
 
     glUniformMatrix4fv(m, 1, GL_FALSE, renderObject->transformation.gl());
     glUniformMatrix4fv(v, 1, GL_FALSE, view_.gl());
@@ -106,6 +107,8 @@ void Renderer::Draw(shared_ptr<RenderObject> renderObject)
     glUniform3fv(c, 1, renderObject->colour);
     glUniform1f(s, renderObject->shininess);
     glUniform3fv(e, 1, cameraPos.gl());
+
+    glUniform1i(environment, 0);
 
     renderObject->object->Draw();
 }
