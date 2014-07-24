@@ -43,7 +43,7 @@ bool ShaderProgram::Build(string vertexShaderSource, string fragmentShaderSource
     
     glShaderSource(fragmentShaderObject, 1, &fs, nullptr);
     glCompileShader(fragmentShaderObject);
-    glGetShaderiv(vertexShaderObject, GL_COMPILE_STATUS, &success);
+    glGetShaderiv(fragmentShaderObject, GL_COMPILE_STATUS, &success);
     if (success == GL_FALSE)
     {
         GetLog(fragmentShaderObject, logBuffer, sizeof(logBuffer));
