@@ -97,8 +97,8 @@ void Renderer::Draw(shared_ptr<RenderObject> renderObject)
     GLint v = glGetUniformLocation(program->Handle(), "v");
     GLint p = glGetUniformLocation(program->Handle(), "p");
     GLint c = glGetUniformLocation(program->Handle(), "colour");
+    GLint specular = glGetUniformLocation(program->Handle(), "specular"); 
     GLint s = glGetUniformLocation(program->Handle(), "shininess");
-    GLint e = glGetUniformLocation(program->Handle(), "eyePosition");
     GLint r = glGetUniformLocation(program->Handle(), "reflectiveness");
     GLint environment = glGetUniformLocation(program->Handle(), "environment");
 
@@ -106,9 +106,9 @@ void Renderer::Draw(shared_ptr<RenderObject> renderObject)
     glUniformMatrix4fv(v, 1, GL_FALSE, view_.gl());
     glUniformMatrix4fv(p, 1, GL_FALSE, projection_.gl());
     glUniform3fv(c, 1, renderObject->colour);
+    glUniform1f(specular, renderObject->specular);
     glUniform1f(s, renderObject->shininess);
     glUniform1f(r, renderObject->reflectiveness);
-    glUniform3fv(e, 1, cameraPos.gl());
 
     glUniform1i(environment, 0);
 

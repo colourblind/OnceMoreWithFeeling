@@ -34,7 +34,21 @@ float cubeVerts[] = {   -0.5f,  0.5f,   0.5f,
                         0.5f,   0.5f,   0.5f,
                         0.5f,   0.5f,   0.5f,
                         0.5f,   -0.5f,  0.5f,
-                        -0.5f,  -0.5f,  0.5f
+                        -0.5f,  -0.5f,  0.5f,
+
+                        -0.5f, -0.5f, -0.5f,
+                        -0.5f, -0.5f, 0.5f,
+                        0.5f, -0.5f, 0.5f,
+                        0.5f, -0.5f, 0.5f,
+                        0.5f, -0.5f, -0.5f,
+                        -0.5f, -0.5f, -0.5f,
+
+                        0.5f, 0.5f, 0.5f,
+                        -0.5f, 0.5f, 0.5f,
+                        -0.5f, 0.5f, -0.5f,
+                        -0.5f, 0.5f, -0.5f,
+                        0.5f, 0.5f, -0.5f,
+                        0.5f, 0.5f, 0.5f
 
 };
 
@@ -65,6 +79,20 @@ float cubeNormals[] = { -1, 0, 0,
                         0, 0, 1,
                         0, 0, 1,
                         0, 0, 1,
+
+                        0, -1, 0,
+                        0, -1, 0,
+                        0, -1, 0,
+                        0, -1, 0,
+                        0, -1, 0,
+                        0, -1, 0,
+
+                        0, 1, 0,
+                        0, 1, 0,
+                        0, 1, 0,
+                        0, 1, 0,
+                        0, 1, 0,
+                        0, 1, 0
 };
 
 float planeVerts[] = { 
@@ -98,11 +126,34 @@ private:
     vector<Vector> rotation_;   // Yep, that won't get confusing
     vector<Vector> position_;
     vector<shared_ptr<RenderObject>> teapots_;
+    shared_ptr<RenderObject> cube_;
     GLuint environmentTexture_;
 };
 
 void TeapotWorld::Init(shared_ptr<Renderer> renderer)
 {
+    renderer->AddShader("basic", "basic");
+    renderer->AddShader("skybox", "skybox");
+
+    shared_ptr<Buffer> cubeVertexBuffer = make_shared<Buffer>();
+    shared_ptr<Buffer> cubeNormalBuffer = make_shared<Buffer>();
+
+    cubeVertexBuffer->SetData(cubeVerts, 108);
+    cubeNormalBuffer->SetData(cubeNormals, 108);
+
+    shared_ptr<Object> c = make_shared<Object>();
+    c->AttachBuffer(0, cubeVertexBuffer);
+    c->AttachBuffer(1, cubeNormalBuffer);
+
+    cube_ = make_shared<RenderObject>();
+    cube_->object = c;
+    cube_->program = "skybox|skybox";
+    cube_->transformation = Matrix::Scale(15, 6, 15);
+    cube_->colour[0] = cube_->colour[1] = cube_->colour[2] = 1;
+    cube_->specular = 0;
+    cube_->shininess = 1;
+    cube_->reflectiveness = 1;
+
     shared_ptr<Buffer> teapotVertexBuffer = make_shared<Buffer>();
     shared_ptr<Buffer> teapotNormalBuffer = make_shared<Buffer>();
 
@@ -121,6 +172,7 @@ void TeapotWorld::Init(shared_ptr<Renderer> renderer)
         teapot->colour[0] = RandF(0, 1);
         teapot->colour[1] = RandF(0, 1);
         teapot->colour[2] = RandF(0, 1);
+        teapot->specular = 1;
         teapot->shininess = 128;
         teapot->reflectiveness = RandF(0, 1);
         teapots_.push_back(teapot);
@@ -157,6 +209,8 @@ void TeapotWorld::Draw(shared_ptr<Renderer> renderer)
 {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, environmentTexture_);
+
+    renderer->Draw(cube_);
 
     for (auto teapot : teapots_)
         renderer->Draw(teapot);

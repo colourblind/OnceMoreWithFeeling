@@ -119,7 +119,6 @@ Window::~Window()
 int Window::Loop(shared_ptr<World> world, shared_ptr<Renderer> renderer)
 {
     renderer_ = renderer;
-    renderer_->AddShader("basic", "basic");
     renderer_->SetWindowSize(width_, height_);
 
     LARGE_INTEGER freq, counter, last;

@@ -18,6 +18,7 @@ namespace OnceMoreWithFeeling
         std::string program;
         Matrix transformation;
         float colour[3];
+        float specular;
         float shininess;
         float reflectiveness;
     };
