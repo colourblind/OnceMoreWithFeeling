@@ -132,11 +132,15 @@ private:
 
 void TeapotWorld::Init(shared_ptr<Renderer> renderer)
 {
+    renderer->AddShader("full", "full");
     renderer->AddShader("basic", "basic");
     renderer->AddShader("skybox", "skybox");
 
     shared_ptr<Buffer> cubeVertexBuffer = make_shared<Buffer>();
     shared_ptr<Buffer> cubeNormalBuffer = make_shared<Buffer>();
+
+    for (int i = 0; i < 108; ++i)
+        cubeNormals[i] *= -1;
 
     cubeVertexBuffer->SetData(cubeVerts, 108);
     cubeNormalBuffer->SetData(cubeNormals, 108);
@@ -147,8 +151,8 @@ void TeapotWorld::Init(shared_ptr<Renderer> renderer)
 
     cube_ = make_shared<RenderObject>();
     cube_->object = c;
-    cube_->program = "skybox|skybox";
-    cube_->transformation = Matrix::Scale(15, 6, 15);
+    cube_->program = "skybox|skybox"; // "basic|basic";
+    cube_->transformation = Matrix::Scale(30, 12, 30);
     cube_->colour[0] = cube_->colour[1] = cube_->colour[2] = 1;
     cube_->specular = 0;
     cube_->shininess = 1;
@@ -164,11 +168,11 @@ void TeapotWorld::Init(shared_ptr<Renderer> renderer)
     o->AttachBuffer(0, teapotVertexBuffer);
     o->AttachBuffer(1, teapotNormalBuffer);
 
-    for (unsigned int i = 0; i < 10; ++i)
+    for (unsigned int i = 0; i < 50; ++i)
     {
         auto teapot = make_shared<RenderObject>();
         teapot->object = o;
-        teapot->program = "basic|basic";
+        teapot->program = "full|full";
         teapot->colour[0] = RandF(0, 1);
         teapot->colour[1] = RandF(0, 1);
         teapot->colour[2] = RandF(0, 1);

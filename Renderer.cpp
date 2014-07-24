@@ -30,7 +30,7 @@ void Renderer::StartFrame()
 
     float aspectRatio = static_cast<float>(height_) / width_;
     float nearClip = 0.1f;
-    float farClip = 20;
+    float farClip = 50;
     float fov = PI / 3;
 
     view_ = Matrix::Camera(cameraPos, cameraLookat);
