@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Windows.h>
-#include "glew.h"
+#include "Lib/glew.h"
 #include <memory>
 
 #include "World.h"

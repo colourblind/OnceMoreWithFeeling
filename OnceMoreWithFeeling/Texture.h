@@ -1,6 +1,6 @@
 #pragma once
 
-#include "glew.h"
+#include "Lib/glew.h"
 #include <string>
 #include <vector>
 

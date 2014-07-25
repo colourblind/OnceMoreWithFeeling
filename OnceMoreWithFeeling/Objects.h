@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <memory>
-#include "glew.h"
+#include "Lib/glew.h"
 
 #include "ShaderProgram.h"
 

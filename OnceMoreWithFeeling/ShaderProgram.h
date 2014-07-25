@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "glew.h"
+#include "Lib/glew.h"
 
 namespace OnceMoreWithFeeling
 {
