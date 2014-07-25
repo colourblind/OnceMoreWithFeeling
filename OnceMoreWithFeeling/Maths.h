@@ -62,6 +62,11 @@ namespace OnceMoreWithFeeling
             }
             return *this;
         }
+
+        float Length()
+        {
+            return ::sqrtf(x * x + y * y + z * z);
+        }
     };
 
     struct Matrix
