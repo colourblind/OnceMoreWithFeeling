@@ -22,7 +22,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -40,11 +40,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)build\$(Configuration)\$(ProjectName)</IntDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)build\$(Configuration)\$(ProjectName)</IntDir>
+    <IntDir>$(SolutionDir)build\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -95,6 +95,12 @@
       <Command>
       </Command>
     </PostBuildEvent>
+    <Lib>
+      <AdditionalDependencies>glew32.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>Lib/Win32</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="FontData.h" />
