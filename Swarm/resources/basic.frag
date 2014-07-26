@@ -22,5 +22,5 @@ void main()
     
     float diffuse = attenuation * max(0.0, dot(n, -lightDir));
     
-    fragColour = vec4((0.75 + 0.25 * diffuse) * colour, 1.0);
+    fragColour = vec4((0.75 + 0.25 * diffuse) * colour.rrr, 1.0);
 }

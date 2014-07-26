@@ -13,14 +13,27 @@ const float NOTICE_DISTANCE = 0.75f;
 const float OPTIMAL_DISTANCE = 0.25f;
 const float MAX_SPEED = 0.001f;
 const float RESPONSIVENESS = 0.000002f;
+const float WING_BEAT_SPEED = 0.001f;
 
 float boidVerts[] = {
-    -0.5f, 0.0f, -0.5f,
-    0.5f, 0.0f, -0.5f,
-    0, 0, 1 
+    -0.2f, 0.0f, -0.4f,
+    0.2f, 0.0f, -0.4f,
+    0, 0, 0,
+    0, 0, 0,
+    -0.65f, 0.5f, 0.25f,
+    0, 0, 0.5f,
+    0, 0, 0,
+    0.65f, 0.5f, 0.25f,
+    0, 0, 0.5f
 };
 
 float boidNormals[] = {
+    0, 1, 0,
+    0, 1, 0,
+    0, 1, 0,
+    0, 1, 0,
+    0, 1, 0,
+    0, 1, 0,
     0, 1, 0,
     0, 1, 0,
     0, 1, 0
@@ -32,6 +45,7 @@ struct Boid
     Vector velocity;
     Vector acceleration;
     shared_ptr<RenderObject> renderObject;
+    float anim;
 };
 
 class SwarmWorld : public World
@@ -53,8 +67,8 @@ void SwarmWorld::Init(shared_ptr<Renderer> renderer)
     shared_ptr<Buffer> boidVertexBuffer = make_shared<Buffer>();
     shared_ptr<Buffer> boidNormalBuffer = make_shared<Buffer>();
 
-    boidVertexBuffer->SetData(boidVerts, 9);
-    boidNormalBuffer->SetData(boidNormals, 9);
+    boidVertexBuffer->SetData(boidVerts, 27);
+    boidNormalBuffer->SetData(boidNormals, 27);
 
     shared_ptr<Object> o = make_shared<Object>();
     o->AttachBuffer(0, boidVertexBuffer);
@@ -65,6 +79,7 @@ void SwarmWorld::Init(shared_ptr<Renderer> renderer)
         shared_ptr<Boid> b = make_shared<Boid>();
         b->position = Vector(RandF(-4, 4), RandF(-4, 4), RandF(-4, 4));
         b->velocity = Vector(RandF(-0.01f, 0.01f), RandF(-0.01f, 0.01f), RandF(-0.01f, 0.01f));
+        b->anim = RandF(0, 1);
         
         b->renderObject = make_shared<RenderObject>();
         b->renderObject->object = o;
@@ -136,6 +151,10 @@ void SwarmWorld::Upate(float msecs)
         // its velocity vector
         Matrix align = Matrix::Camera(Vector(), current->velocity);
         current->renderObject->transformation = Matrix::Translate(current->position) * align * Matrix::Scale(0.1f);
+
+        current->anim += WING_BEAT_SPEED * msecs;
+        if (current->anim > 1)
+            current->anim -= 1;
     }
 
     ermergerd_ -= msecs;
@@ -145,10 +164,13 @@ void SwarmWorld::Draw(shared_ptr<Renderer> renderer)
 {
     for (auto b : boids_)
     {
-        if (ermergerd_ > 0)
-            b->renderObject->colour[0] = b->renderObject->colour[1] = b->renderObject->colour[2] = 1;
-        else
+        //if (ermergerd_ > 0)
+        //    b->renderObject->colour[0] = b->renderObject->colour[1] = b->renderObject->colour[2] = 1;
+        //else
             b->renderObject->colour[0] = b->renderObject->colour[1] = b->renderObject->colour[2] = 0;
+
+        // TODO: get animation value into shaders :-/
+        b->renderObject->colour[2] = b->anim;
 
         renderer->Draw(b->renderObject);
     }
