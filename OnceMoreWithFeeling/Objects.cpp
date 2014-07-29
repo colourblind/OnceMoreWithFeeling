@@ -13,10 +13,10 @@ Object::~Object()
     glDeleteVertexArrays(1, &arrayObject_);
 }
 
-void Object::Draw()
+void Object::Draw(GLenum type)
 {
     Activate();
-    glDrawArrays(GL_TRIANGLES, 0, count_);
+    glDrawArrays(type, 0, count_);
     Deactivate();
 }
 

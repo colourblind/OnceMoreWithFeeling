@@ -31,7 +31,7 @@ namespace OnceMoreWithFeeling
 
         void StartFrame();
         void EndFrame();
-        void Draw(std::shared_ptr<RenderObject> renderObject);
+        void Draw(std::shared_ptr<RenderObject> renderObject, GLenum type = GL_TRIANGLES);
         
         void AddShader(std::string vertexShaderName, std::string fragmentShaderName);
         void SetWindowSize(unsigned int width, unsigned int height);

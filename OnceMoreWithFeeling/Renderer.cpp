@@ -79,7 +79,7 @@ void Renderer::EndFrame()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_DEPTH_TEST);
 
-    o.Draw();
+    o.Draw(GL_TRIANGLES);
 
     glDisable(GL_BLEND);
 
@@ -88,7 +88,7 @@ void Renderer::EndFrame()
     frameCount_++;
 }
 
-void Renderer::Draw(shared_ptr<RenderObject> renderObject)
+void Renderer::Draw(shared_ptr<RenderObject> renderObject, GLenum type)
 {
     shared_ptr<ShaderProgram> program = shaders_[renderObject->program];
     program->Activate();
@@ -112,7 +112,7 @@ void Renderer::Draw(shared_ptr<RenderObject> renderObject)
 
     glUniform1i(environment, 0);
 
-    renderObject->object->Draw();
+    renderObject->object->Draw(type);
 }
 
 void Renderer::AddShader(string vertexShaderName, string fragmentShaderName)

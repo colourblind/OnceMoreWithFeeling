@@ -32,7 +32,7 @@ namespace OnceMoreWithFeeling
         Object();
         ~Object();
 
-        void Draw();
+        void Draw(GLenum type);
 
         void Activate() { glBindVertexArray(arrayObject_); }
         static void Deactivate() { glBindVertexArray(0); }
