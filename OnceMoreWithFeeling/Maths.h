@@ -67,6 +67,11 @@ namespace OnceMoreWithFeeling
         {
             return ::sqrtf(x * x + y * y + z * z);
         }
+
+        float LengthSq()
+        {
+            return x * x + y * y + z * z;
+        }
     };
 
     struct Matrix

@@ -8,12 +8,12 @@
 using namespace OnceMoreWithFeeling;
 using namespace std;
 
-const unsigned int NUM_BOIDS = 500;
+const unsigned int NUM_BOIDS = 1000;
 const float NOTICE_DISTANCE = 0.75f;
 const float OPTIMAL_DISTANCE = 0.25f;
 const float MAX_SPEED = 0.001f;
 const float RESPONSIVENESS = 0.000002f;
-const float WING_BEAT_SPEED = 0.001f;
+const float WING_BEAT_SPEED = 0.003f;
 
 float boidVerts[] = {
     -0.2f, 0.0f, -0.4f,
@@ -112,11 +112,11 @@ void SwarmWorld::Upate(float msecs)
                 continue;
 
             shared_ptr<Boid> b = boids_[j];
-            if ((current->position - b->position).Length() < NOTICE_DISTANCE)
+            Vector v = b->position - current->position;
+            if (v.LengthSq() < NOTICE_DISTANCE * NOTICE_DISTANCE)
             {
-                Vector v = b->position - current->position;
                 // cohesion and seperation
-                if (v.Length() > OPTIMAL_DISTANCE)
+                if (v.LengthSq() > OPTIMAL_DISTANCE * OPTIMAL_DISTANCE)
                     cohesion = cohesion + v;
                 else
                     seperation = seperation - v;
@@ -143,7 +143,7 @@ void SwarmWorld::Upate(float msecs)
         current->acceleration = pull * RESPONSIVENESS;
         current->velocity = current->velocity + current->acceleration * msecs;
 
-        if (current->velocity.Length() > MAX_SPEED)
+        if (current->velocity.LengthSq() > MAX_SPEED * MAX_SPEED)
             current->velocity = current->velocity.Normalise() * MAX_SPEED;
         current->position = current->position + current->velocity * msecs;
 
