@@ -17,7 +17,16 @@ GLuint OnceMoreWithFeeling::LoadTexture(string filename)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
     unsigned char *data = stbi_load(filename.c_str(), &width, &height, &componentsPerPixel, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+    GLenum format = GL_RGB;
+    switch (componentsPerPixel)
+    {
+    case 4:
+        format = GL_RGBA;
+    }
+
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     stbi_image_free(data);
 
     return handle;

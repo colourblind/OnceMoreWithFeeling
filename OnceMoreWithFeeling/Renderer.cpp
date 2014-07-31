@@ -5,10 +5,8 @@
 using namespace OnceMoreWithFeeling;
 using namespace std;
 
-Vector cameraPos(0, 0, 7);
-Vector cameraLookat(0, 0, 0);
-
-Renderer::Renderer() : font_(), frameCount_(0), fps_(0)
+Renderer::Renderer() : font_(), frameCount_(0), fps_(0), 
+cameraPosition_(0, 0, 7), cameraLookAt_(0, 0, 0)
 {
     AddShader("text", "text");
 }
@@ -33,7 +31,7 @@ void Renderer::StartFrame()
     float farClip = 50;
     float fov = PI / 3;
 
-    view_ = Matrix::Camera(cameraPos, cameraLookat);
+    view_ = Matrix::Camera(cameraPosition_, cameraLookAt_);
     projection_ = Matrix::Projection(nearClip, farClip, aspectRatio, fov);
 }
 
@@ -128,4 +126,19 @@ void Renderer::SetWindowSize(unsigned int width, unsigned int height)
 {
     width_ = width;
     height_ = height;
+}
+
+void Renderer::SetUniform(std::string program, int location, int value)
+{
+    glProgramUniform1i(shaders_[program]->Handle(), location, value);
+}
+
+void Renderer::SetUniform(std::string program, int location, float value)
+{
+    glProgramUniform1f(shaders_[program]->Handle(), location, value);
+}
+
+void Renderer::SetUniform(std::string program, int location, Vector value)
+{
+    glProgramUniform3fv(shaders_[program]->Handle(), location, 1, value.gl());
 }

@@ -32,10 +32,17 @@ namespace OnceMoreWithFeeling
         void StartFrame();
         void EndFrame();
         void Draw(std::shared_ptr<RenderObject> renderObject, GLenum type = GL_TRIANGLES);
-        
+
+        void SetCameraPosition(Vector cameraPosition) { cameraPosition_ = cameraPosition; }
+        void SetCameraLookAt(Vector cameraLookAt) { cameraLookAt_ = cameraLookAt; }
+
         void AddShader(std::string vertexShaderName, std::string fragmentShaderName);
         void SetWindowSize(unsigned int width, unsigned int height);
         void ResetFrameCount() { fps_ = frameCount_; frameCount_ = 0; }
+
+        void SetUniform(std::string program, int location, int value);
+        void SetUniform(std::string program, int location, float value);
+        void SetUniform(std::string program, int location, Vector value);
 
     protected:
         std::unordered_map<std::string, std::shared_ptr<ShaderProgram>> shaders_;
@@ -46,5 +53,7 @@ namespace OnceMoreWithFeeling
         unsigned int fps_;
         Matrix projection_;
         Matrix view_;
+        Vector cameraPosition_;
+        Vector cameraLookAt_;
     };
 }

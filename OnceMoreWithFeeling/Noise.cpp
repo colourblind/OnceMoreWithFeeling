@@ -24,7 +24,7 @@ void OnceMoreWithFeeling::CreateNoise(vector<float> &data, int octaves, int widt
 
     for (int o = 0; o < octaves; ++o)
     {
-        float step = powf(2, static_cast<float>(o));
+        int step = static_cast<int>(powf(2, static_cast<float>(o)));
         float max = 1.f / powf(2, static_cast<float>(octaves - o));
         for (int x = 0; x < width; x += step)
         {
