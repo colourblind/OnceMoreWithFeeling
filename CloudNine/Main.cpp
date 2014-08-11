@@ -85,8 +85,7 @@ void CloudNineWorld::Init(shared_ptr<Renderer> renderer)
     // Sort the renderObject and normal vectors based on the renderObjects' z translation. At least
     // c++11 makes this slightly less like being punched in the balls
     vector<pair<Vector, shared_ptr<RenderObject>>> ouch(fluffs_.size());
-    int i = 0;
-    for (int i = 0; i < fluffs_.size(); ++i)
+    for (unsigned int i = 0; i < fluffs_.size(); ++i)
         ouch[i] = make_pair(fluffNormals_[i], fluffs_[i]);
 
     // Sort our new FrankenCollection
@@ -95,7 +94,7 @@ void CloudNineWorld::Init(shared_ptr<Renderer> renderer)
     });
 
     // Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn.
-    for (int i = 0; i < ouch.size(); ++i)
+    for (unsigned int i = 0; i < ouch.size(); ++i)
     {
         fluffNormals_[i] = ouch[i].first;
         fluffs_[i] = ouch[i].second;
