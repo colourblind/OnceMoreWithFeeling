@@ -14,6 +14,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Swarm", "Swarm\Swarm.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CloudNine", "CloudNine\CloudNine.vcxproj", "{5E9B7800-FE86-4E13-8A60-7253C579B361}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataCube", "DataCube\DataCube.vcxproj", "{3BDA7B37-B0D6-453B-B3AA-C359052126F7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -36,6 +38,10 @@ Global
 		{5E9B7800-FE86-4E13-8A60-7253C579B361}.Debug|Win32.Build.0 = Debug|Win32
 		{5E9B7800-FE86-4E13-8A60-7253C579B361}.Release|Win32.ActiveCfg = Release|Win32
 		{5E9B7800-FE86-4E13-8A60-7253C579B361}.Release|Win32.Build.0 = Release|Win32
+		{3BDA7B37-B0D6-453B-B3AA-C359052126F7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3BDA7B37-B0D6-453B-B3AA-C359052126F7}.Debug|Win32.Build.0 = Debug|Win32
+		{3BDA7B37-B0D6-453B-B3AA-C359052126F7}.Release|Win32.ActiveCfg = Release|Win32
+		{3BDA7B37-B0D6-453B-B3AA-C359052126F7}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
