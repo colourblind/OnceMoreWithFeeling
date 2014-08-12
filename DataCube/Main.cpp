@@ -21,16 +21,17 @@ public:
     virtual void Draw(shared_ptr<Renderer> renderer);
 
 private:
-    void LoadData(wstring filename, int dimensions, vector<float> &result, unsigned long *activePoints, float *maxCount);
+    void LoadData(wstring filename, int dimensions, vector<float> &result, unsigned long *activePoints, float *minValue, float *maxValue);
     void CreateCube(shared_ptr<Buffer> vertexBuffer, shared_ptr<Buffer> colourBuffer);
     Vector GetColour(float f, float mean);
 
-    shared_ptr<RenderObject> cube_;
+    shared_ptr<RenderObject> object_;
     float rotation_;
     RenderMode renderMode_;
+    wstring targetFile_;
 };
 
-void DataCubeWorld::LoadData(wstring filename, int dimensions, vector<float> &result, unsigned long *activePoints, float *maxCount)
+void DataCubeWorld::LoadData(wstring filename, int dimensions, vector<float> &result, unsigned long *activePoints, float *minValue, float *maxValue)
 {
     ifstream f;
     f.open(filename, ios::in | ios::binary);
@@ -44,7 +45,8 @@ void DataCubeWorld::LoadData(wstring filename, int dimensions, vector<float> &re
     result = vector<float>(static_cast<int>(powf(256, static_cast<float>(dimensions))));
 
     float s = 1.f / length;
-    *maxCount = 0;
+    *maxValue = 0;
+    *minValue = 1;
     *activePoints = 0;
     while (!f.eof())
     {
@@ -58,7 +60,8 @@ void DataCubeWorld::LoadData(wstring filename, int dimensions, vector<float> &re
         if (result[index] < s)
             (*activePoints)++;
         result[index] += s;
-        *maxCount = max(*maxCount, result[index]);
+        *maxValue = max(*maxValue, result[index]);
+        *minValue = min(*minValue, result[index]);
     }
     f.close();
 
@@ -67,25 +70,26 @@ void DataCubeWorld::LoadData(wstring filename, int dimensions, vector<float> &re
 
 void DataCubeWorld::CreateCube(shared_ptr<Buffer> vertexBuffer, shared_ptr<Buffer> colourBuffer)
 {
-    int numArgs;
-    LPWSTR *args = ::CommandLineToArgvW(::GetCommandLineW(), &numArgs);
-
-    wstring r(args[1]);
-    if (r.compare(L"cube") == 0)
-        renderMode_ = RenderMode::CUBE;
-    else if (r.compare(L"sphere") == 0)
-        renderMode_ = RenderMode::SPHERE;
-
     vector<float> counts;
     unsigned long activePoints;
-    float maxCount;
-    LoadData(wstring(args[2]), 3, counts, &activePoints, &maxCount);
+    float minValue, maxValue;
+    switch (renderMode_)
+    {
+        case RenderMode::CUBE:
+        case RenderMode::SPHERE:
+            LoadData(targetFile_, 3, counts, &activePoints, &minValue, &maxValue);
+            break;
+    }
 
     // This is designed to map the mean to 0.5 when raised to the power s
     // in an attempt to normalise the results.
     float average = 0;
     for (auto v : counts)
-        average += v / activePoints;
+    {
+        if (v > 0)
+            average += (v - minValue) / activePoints;
+    }
+
     float scale = ::logf(0.5f) / ::logf(average);
 
     vector<float> vertexData;
@@ -115,7 +119,7 @@ void DataCubeWorld::CreateCube(shared_ptr<Buffer> vertexBuffer, shared_ptr<Buffe
                         vertexData.push_back(rho * cosf(theta));
                     }
 
-                    Vector c = GetColour(counts[index] / maxCount, scale);
+                    Vector c = GetColour((counts[index] - minValue) / (maxValue - minValue), scale);
                     colourData.push_back(c.x);
                     colourData.push_back(c.y);
                     colourData.push_back(c.z);
@@ -130,7 +134,7 @@ void DataCubeWorld::CreateCube(shared_ptr<Buffer> vertexBuffer, shared_ptr<Buffe
 
 Vector DataCubeWorld::GetColour(float f, float scale)
 {
-    Vector c[4] = {
+    Vector c[] = {
         Vector(0, 0, 0),
         Vector(0, 0, 1),
         Vector(0, 1, 1),
@@ -153,6 +157,17 @@ Vector DataCubeWorld::GetColour(float f, float scale)
 
 void DataCubeWorld::Init(shared_ptr<Renderer> renderer)
 {
+    int numArgs;
+    LPWSTR *args = ::CommandLineToArgvW(::GetCommandLineW(), &numArgs);
+
+    wstring r(args[1]);
+    if (r.compare(L"cube") == 0)
+        renderMode_ = RenderMode::CUBE;
+    else if (r.compare(L"sphere") == 0)
+        renderMode_ = RenderMode::SPHERE;
+
+    targetFile_ = wstring(args[2]);
+
     renderer->AddShader("basic", "basic");
 
     shared_ptr<Buffer> vertexBuffer = make_shared<Buffer>();
@@ -163,9 +178,9 @@ void DataCubeWorld::Init(shared_ptr<Renderer> renderer)
     o->AttachBuffer(0, vertexBuffer);
     o->AttachBuffer(1, colourBuffer);
 
-    cube_ = make_shared<RenderObject>();
-    cube_->object = o;
-    cube_->program = "basic|basic";
+    object_ = make_shared<RenderObject>();
+    object_->object = o;
+    object_->program = "basic|basic";
 
     rotation_ = 0;
 }
@@ -177,9 +192,9 @@ void DataCubeWorld::Upate(float msecs)
         rotation_ -= PI * 2;
 
     if (renderMode_ == RenderMode::CUBE)
-        cube_->transformation = Matrix::Scale(4.5f / 256) * Matrix::Rotate(0, rotation_, 0) * Matrix::Translate(-128, -128, -128);
+        object_->transformation = Matrix::Scale(4.5f / 256) * Matrix::Rotate(0, rotation_, 0) * Matrix::Translate(-128, -128, -128);
     else if (renderMode_ == RenderMode::SPHERE)
-        cube_->transformation = Matrix::Scale(3) * Matrix::Rotate(0, rotation_, 0);
+        object_->transformation = Matrix::Scale(3) * Matrix::Rotate(0, rotation_, 0);
 }
 
 void DataCubeWorld::Draw(shared_ptr<Renderer> renderer)
@@ -188,7 +203,7 @@ void DataCubeWorld::Draw(shared_ptr<Renderer> renderer)
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    renderer->Draw(cube_, GL_POINTS);
+    renderer->Draw(object_, GL_POINTS);
 }
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev, LPSTR commandLine, int show)
