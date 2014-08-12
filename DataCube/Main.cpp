@@ -135,13 +135,14 @@ void DataCubeWorld::CreateCube(shared_ptr<Buffer> vertexBuffer, shared_ptr<Buffe
 Vector DataCubeWorld::GetColour(float f, float scale)
 {
     Vector c[] = {
-        Vector(0, 0, 0),
         Vector(0, 0, 1),
-        Vector(0, 1, 1),
+        Vector(1, 0, 1),
+        Vector(1, 0, 0),
+        Vector(1, 1, 0),
         Vector(1, 1, 1)
     };
     f = pow(f, scale);
-    f *= 3;
+    f *= 4;
     
     Vector c0 = c[static_cast<int>(floor(f))];
     Vector c1 = c[static_cast<int>(ceil(f))];
