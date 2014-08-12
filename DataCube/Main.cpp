@@ -11,7 +11,7 @@
 using namespace OnceMoreWithFeeling;
 using namespace std;
 
-enum class RenderMode { CUBE, SPHERE };
+enum class RenderMode { CUBE, SPHERE, TERRAIN };
 
 class DataCubeWorld : public World
 {
@@ -79,6 +79,9 @@ void DataCubeWorld::CreateCube(shared_ptr<Buffer> vertexBuffer, shared_ptr<Buffe
         case RenderMode::SPHERE:
             LoadData(targetFile_, 3, counts, &activePoints, &minValue, &maxValue);
             break;
+        case RenderMode::TERRAIN:
+            LoadData(targetFile_, 2, counts, &activePoints, &minValue, &maxValue);
+            break;
     }
 
     // This is designed to map the mean to 0.5 when raised to the power s
@@ -98,31 +101,46 @@ void DataCubeWorld::CreateCube(shared_ptr<Buffer> vertexBuffer, shared_ptr<Buffe
     {
         for (int y = 0; y < 256; ++y)
         {
-            for (int z = 0; z < 256; ++z)
+            if (renderMode_ == RenderMode::TERRAIN)
             {
-                unsigned int index = x * 256 * 256 + y * 256 + z;
-                if (counts[index] > 0)
-                {
-                    if (renderMode_ == RenderMode::CUBE)
-                    {
-                        vertexData.push_back(static_cast<float>(x));
-                        vertexData.push_back(static_cast<float>(y));
-                        vertexData.push_back(static_cast<float>(z));
-                    }
-                    else if (renderMode_ == RenderMode::SPHERE)
-                    {
-                        float theta = (static_cast<float>(x) / 256) * PI * 2;
-                        float phi = (static_cast<float>(y) / 256) * PI * 2;
-                        float rho = static_cast<float>(z) / 255;
-                        vertexData.push_back(rho * sinf(theta) * cosf(phi));
-                        vertexData.push_back(rho * sinf(theta) * sinf(phi));
-                        vertexData.push_back(rho * cosf(theta));
-                    }
+                unsigned int index = x * 256 + y;
+                vertexData.push_back(static_cast<float>(x));
+                vertexData.push_back(powf(counts[index] / maxValue, scale));
+                vertexData.push_back(static_cast<float>(y));
 
-                    Vector c = GetColour((counts[index] - minValue) / (maxValue - minValue), scale);
-                    colourData.push_back(c.x);
-                    colourData.push_back(c.y);
-                    colourData.push_back(c.z);
+                Vector c = GetColour((counts[index] - minValue) / (maxValue - minValue), scale);
+                colourData.push_back(c.x);
+                colourData.push_back(c.y);
+                colourData.push_back(c.z);
+            }
+            else
+            {
+                for (int z = 0; z < 256; ++z)
+                {
+                    unsigned int index = x * 256 * 256 + y * 256 + z;
+                    if (counts[index] > 0)
+                    {
+                        if (renderMode_ == RenderMode::CUBE)
+                        {
+                            vertexData.push_back(static_cast<float>(x));
+                            vertexData.push_back(static_cast<float>(y));
+                            vertexData.push_back(static_cast<float>(z));
+                        }
+                        else if (renderMode_ == RenderMode::SPHERE)
+                        {
+                            float theta = (static_cast<float>(x) / 256) * PI * 2;
+                            float phi = (static_cast<float>(y) / 256) * PI * 2;
+                            float rho = static_cast<float>(z) / 255;
+                            vertexData.push_back(rho * sinf(theta) * cosf(phi));
+                            vertexData.push_back(rho * sinf(theta) * sinf(phi));
+                            vertexData.push_back(rho * cosf(theta));
+                        }
+
+                        Vector c = GetColour((counts[index] - minValue) / (maxValue - minValue), scale);
+                        colourData.push_back(c.x);
+                        colourData.push_back(c.y);
+                        colourData.push_back(c.z);
+                    }
                 }
             }
         }
@@ -166,10 +184,18 @@ void DataCubeWorld::Init(shared_ptr<Renderer> renderer)
         renderMode_ = RenderMode::CUBE;
     else if (r.compare(L"sphere") == 0)
         renderMode_ = RenderMode::SPHERE;
+    else if (r.compare(L"terrain") == 0)
+        renderMode_ = RenderMode::TERRAIN;
 
     targetFile_ = wstring(args[2]);
 
     renderer->AddShader("basic", "basic");
+
+    if (renderMode_ == RenderMode::TERRAIN)
+    {
+        renderer->SetCameraPosition(Vector(0, 5, 6));
+        renderer->SetCameraLookAt(Vector(0, 1.5, 0));
+    }
 
     shared_ptr<Buffer> vertexBuffer = make_shared<Buffer>();
     shared_ptr<Buffer> colourBuffer = make_shared<Buffer>();
@@ -196,6 +222,8 @@ void DataCubeWorld::Upate(float msecs)
         object_->transformation = Matrix::Scale(4.5f / 256) * Matrix::Rotate(0, rotation_, 0) * Matrix::Translate(-128, -128, -128);
     else if (renderMode_ == RenderMode::SPHERE)
         object_->transformation = Matrix::Scale(3) * Matrix::Rotate(0, rotation_, 0);
+    else if (renderMode_ == RenderMode::TERRAIN)
+        object_->transformation = Matrix::Scale(4.f / 256, 3, 4.f / 256) * Matrix::Rotate(0, rotation_, 0) * Matrix::Translate(-128, 0, -128);
 }
 
 void DataCubeWorld::Draw(shared_ptr<Renderer> renderer)
