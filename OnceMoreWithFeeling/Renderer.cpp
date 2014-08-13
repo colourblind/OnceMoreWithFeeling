@@ -5,10 +5,35 @@
 using namespace OnceMoreWithFeeling;
 using namespace std;
 
+const string TEXT_VERTEX_SOURCE = "#version 410\n\
+layout(location = 0) in vec2 vertex;\
+layout(location = 1) in vec2 texCoord;\
+layout(location = 0) out vec2 texCoordOut;\
+uniform mat4 m;\
+uniform mat4 v;\
+uniform mat4 p;\
+void main()\
+{\
+    texCoordOut = texCoord;\
+    gl_Position = p * v * m * vec4(vertex, 0.0, 1.0);\
+}";
+
+const string TEXT_FRAGMENT_SOURCE = "#version 410\n\
+layout(location = 0) in vec2 texCoord;\
+layout(location = 0) out vec4 fragColour;\
+uniform vec3 colour;\
+uniform sampler2D font;\
+void main()\
+{\
+    fragColour = vec4(colour, texture(font, texCoord).r);\
+}";
+
 Renderer::Renderer() : font_(), frameCount_(0), fps_(0), 
 cameraPosition_(0, 0, 7), cameraLookAt_(0, 0, 0)
 {
-    AddShader("text", "text");
+    shared_ptr<ShaderProgram> textProgram = make_shared<ShaderProgram>();
+    textProgram->Build(TEXT_VERTEX_SOURCE, TEXT_FRAGMENT_SOURCE);
+    shaders_.insert(make_pair("text|text", textProgram));
 }
 
 Renderer::~Renderer()
