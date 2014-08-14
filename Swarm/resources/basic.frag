@@ -6,10 +6,6 @@ layout(location = 1) in vec3 worldspacePosition;
 layout(location = 0) out vec4 fragColour;
 
 uniform vec3 colour;
-uniform float specular;
-uniform float shininess;
-uniform float reflectiveness;
-
 uniform samplerCube environment;
 
 void main()

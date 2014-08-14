@@ -126,6 +126,7 @@ private:
     vector<Vector> rotation_;   // Yep, that won't get confusing
     vector<Vector> position_;
     vector<shared_ptr<RenderObject>> teapots_;
+    vector<float> reflectiveness_;
     shared_ptr<RenderObject> cube_;
     GLuint environmentTexture_;
 };
@@ -133,8 +134,10 @@ private:
 void TeapotWorld::Init(shared_ptr<Renderer> renderer)
 {
     renderer->AddShader("full", "full");
-    renderer->AddShader("basic", "basic");
     renderer->AddShader("skybox", "skybox");
+
+    renderer->SetUniform("full|full", 0, 1.f); // specular
+    renderer->SetUniform("full|full", 1, 128.f); // shininess
 
     shared_ptr<Buffer> cubeVertexBuffer = make_shared<Buffer>();
     shared_ptr<Buffer> cubeNormalBuffer = make_shared<Buffer>();
@@ -151,12 +154,9 @@ void TeapotWorld::Init(shared_ptr<Renderer> renderer)
 
     cube_ = make_shared<RenderObject>();
     cube_->object = c;
-    cube_->program = "skybox|skybox"; // "basic|basic";
+    cube_->program = "skybox|skybox";
     cube_->transformation = Matrix::Scale(30, 12, 30);
     cube_->colour[0] = cube_->colour[1] = cube_->colour[2] = 1;
-    cube_->specular = 0;
-    cube_->shininess = 1;
-    cube_->reflectiveness = 1;
 
     shared_ptr<Buffer> teapotVertexBuffer = make_shared<Buffer>();
     shared_ptr<Buffer> teapotNormalBuffer = make_shared<Buffer>();
@@ -176,13 +176,11 @@ void TeapotWorld::Init(shared_ptr<Renderer> renderer)
         teapot->colour[0] = RandF(0, 1);
         teapot->colour[1] = RandF(0, 1);
         teapot->colour[2] = RandF(0, 1);
-        teapot->specular = 1;
-        teapot->shininess = 128;
-        teapot->reflectiveness = RandF(0, 1);
         teapots_.push_back(teapot);
 
         rotation_.push_back(Vector(RandF(0, PI), RandF(0, PI), RandF(0, PI)));
         position_.push_back(Vector(RandF(-5, 5), RandF(-2, 2), RandF(-5, 5)));
+        reflectiveness_.push_back(RandF(0, 1));
     }
 
     vector<string> environment = { "posx.jpg", "negx.jpg", "posy.jpg", "negy.jpg", "posz.jpg", "negz.jpg" };
@@ -216,8 +214,11 @@ void TeapotWorld::Draw(shared_ptr<Renderer> renderer)
 
     renderer->Draw(cube_);
 
-    for (auto teapot : teapots_)
-        renderer->Draw(teapot);
+    for (unsigned int i = 0; i < teapots_.size(); ++i)
+    {
+        renderer->SetUniform("full|full", 2, reflectiveness_[i]);
+        renderer->Draw(teapots_[i]);
+    }
 }
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev, LPSTR commandLine, int show)

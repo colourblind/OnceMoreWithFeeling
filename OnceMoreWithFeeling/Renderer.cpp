@@ -120,18 +120,12 @@ void Renderer::Draw(shared_ptr<RenderObject> renderObject, GLenum type)
     GLint v = glGetUniformLocation(program->Handle(), "v");
     GLint p = glGetUniformLocation(program->Handle(), "p");
     GLint c = glGetUniformLocation(program->Handle(), "colour");
-    GLint specular = glGetUniformLocation(program->Handle(), "specular"); 
-    GLint s = glGetUniformLocation(program->Handle(), "shininess");
-    GLint r = glGetUniformLocation(program->Handle(), "reflectiveness");
     GLint environment = glGetUniformLocation(program->Handle(), "environment");
 
     glUniformMatrix4fv(m, 1, GL_FALSE, renderObject->transformation.gl());
     glUniformMatrix4fv(v, 1, GL_FALSE, view_.gl());
     glUniformMatrix4fv(p, 1, GL_FALSE, projection_.gl());
     glUniform3fv(c, 1, renderObject->colour);
-    glUniform1f(specular, renderObject->specular);
-    glUniform1f(s, renderObject->shininess);
-    glUniform1f(r, renderObject->reflectiveness);
 
     glUniform1i(environment, 0);
 
