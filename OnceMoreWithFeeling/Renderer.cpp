@@ -49,7 +49,6 @@ void Renderer::StartFrame()
     glEnable(GL_DEPTH_TEST);
     glCullFace(GL_BACK);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.4f, 0.6f, 0.9f, 0.0f);
 
     float aspectRatio = static_cast<float>(height_) / width_;
     float nearClip = 0.1f;

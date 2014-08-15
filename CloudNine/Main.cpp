@@ -105,6 +105,7 @@ void CloudNineWorld::Init(shared_ptr<Renderer> renderer)
     flashTime_ = 0;
     lightRotation_ = 0;
 
+    glClearColor(0.4f, 0.6f, 0.9f, 1.0f);
     renderer->SetCameraPosition(Vector(0, 0, 20));
     renderer->SetCameraLookAt(Vector(0, 0, -1));
 }
