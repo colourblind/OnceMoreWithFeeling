@@ -27,6 +27,50 @@ float boidVerts[] = {
     0, 0, 0.5f
 };
 
+float cubeVerts[] = { 
+    -0.5f, 0.5f, 0.5f,
+    -0.5f, -0.5f, 0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, 0.5f, -0.5f,
+    -0.5f, 0.5f, 0.5f,
+
+    0.5f, -0.5f, -0.5f,
+    0.5f, -0.5f, 0.5f,
+    0.5f, 0.5f, 0.5f,
+    0.5f, 0.5f, 0.5f,
+    0.5f, 0.5f, -0.5f,
+    0.5f, -0.5f, -0.5f,
+
+    0.5f, 0.5f, -0.5f,
+    -0.5f, 0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    0.5f, -0.5f, -0.5f,
+    0.5f, 0.5f, -0.5f,
+
+    -0.5f, -0.5f, 0.5f,
+    -0.5f, 0.5f, 0.5f,
+    0.5f, 0.5f, 0.5f,
+    0.5f, 0.5f, 0.5f,
+    0.5f, -0.5f, 0.5f,
+    -0.5f, -0.5f, 0.5f,
+
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, 0.5f,
+    0.5f, -0.5f, 0.5f,
+    0.5f, -0.5f, 0.5f,
+    0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+
+    0.5f, 0.5f, 0.5f,
+    -0.5f, 0.5f, 0.5f,
+    -0.5f, 0.5f, -0.5f,
+    -0.5f, 0.5f, -0.5f,
+    0.5f, 0.5f, -0.5f,
+    0.5f, 0.5f, 0.5f
+};
+
 struct Boid
 {
     Vector position;
@@ -46,14 +90,16 @@ public:
 private:
     vector<shared_ptr<Boid>> boids_;
     float ermergerd_;
+    shared_ptr<RenderObject> skybox_;
+    GLuint skyboxTexture_;
 };
 
 void SwarmWorld::Init(shared_ptr<Renderer> renderer)
 {
     renderer->AddShader("basic", "basic");
+    renderer->AddShader("skybox", "skybox");
 
     shared_ptr<Buffer> boidVertexBuffer = make_shared<Buffer>();
-
     boidVertexBuffer->SetData(boidVerts, 27);
 
     shared_ptr<Object> o = make_shared<Object>();
@@ -75,6 +121,25 @@ void SwarmWorld::Init(shared_ptr<Renderer> renderer)
     }
 
     ermergerd_ = 0;
+
+    shared_ptr<Buffer> skyboxVertexBuffer = make_shared<Buffer>();
+    skyboxVertexBuffer->SetData(cubeVerts, 108);
+    shared_ptr<Object> skyboxObject = make_shared<Object>();
+    skyboxObject->AttachBuffer(0, skyboxVertexBuffer);
+
+    skybox_ = make_shared<RenderObject>();
+    skybox_->object = skyboxObject;
+    skybox_->program = "skybox|skybox";
+
+    vector<string> skyboxFilenames = { "posx.png", "negx.png", "posy.png", "negy.png", "posz.png", "negz.png" };
+    skyboxTexture_ = LoadCubeTexture(skyboxFilenames);
+
+    renderer->SetUniform("skybox|skybox", 0, 0);
+
+    renderer->SetCameraPosition(Vector(0, -2, 7));
+    renderer->SetCameraLookAt(Vector(0, 0, 0));
+
+    glDisable(GL_CULL_FACE);
 }
 
 void SwarmWorld::Upate(float msecs)
@@ -147,6 +212,13 @@ void SwarmWorld::Upate(float msecs)
 
 void SwarmWorld::Draw(shared_ptr<Renderer> renderer)
 {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, skyboxTexture_);
+
+    glDepthMask(GL_FALSE);
+    renderer->Draw(skybox_);
+
+    glDepthMask(GL_TRUE);
     for (auto b : boids_)
     {
         b->renderObject->colour[2] = b->anim;
