@@ -119,6 +119,8 @@ void TeapotWorld::Init(shared_ptr<Renderer> renderer)
 
     vector<string> environment = { "posx.jpg", "negx.jpg", "posy.jpg", "negy.jpg", "posz.jpg", "negz.jpg" };
     environmentTexture_ = LoadCubeTexture(environment);
+
+    renderer->SetUniform("skybox|skybox", 0, 0); // environment
 }
 
 void TeapotWorld::Upate(float msecs)

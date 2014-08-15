@@ -38,8 +38,8 @@ cameraPosition_(0, 0, 7), cameraLookAt_(0, 0, 0)
 
 Renderer::~Renderer()
 {
-    for (auto iter = begin(shaders_); iter != end(shaders_); ++iter)
-        glDeleteProgram(iter->second->Handle());
+    for (auto shader : shaders_)
+        glDeleteProgram(shader.second->Handle());
 }
 
 void Renderer::StartFrame()
@@ -126,8 +126,6 @@ void Renderer::Draw(shared_ptr<RenderObject> renderObject, GLenum type)
     glUniformMatrix4fv(v, 1, GL_FALSE, view_.gl());
     glUniformMatrix4fv(p, 1, GL_FALSE, projection_.gl());
     glUniform3fv(c, 1, renderObject->colour);
-
-    glUniform1i(environment, 0);
 
     renderObject->object->Draw(type);
 }
