@@ -27,18 +27,6 @@ float boidVerts[] = {
     0, 0, 0.5f
 };
 
-float boidNormals[] = {
-    0, 1, 0,
-    0, 1, 0,
-    0, 1, 0,
-    0, 1, 0,
-    0, 1, 0,
-    0, 1, 0,
-    0, 1, 0,
-    0, 1, 0,
-    0, 1, 0
-};
-
 struct Boid
 {
     Vector position;
@@ -65,14 +53,11 @@ void SwarmWorld::Init(shared_ptr<Renderer> renderer)
     renderer->AddShader("basic", "basic");
 
     shared_ptr<Buffer> boidVertexBuffer = make_shared<Buffer>();
-    shared_ptr<Buffer> boidNormalBuffer = make_shared<Buffer>();
 
     boidVertexBuffer->SetData(boidVerts, 27);
-    boidNormalBuffer->SetData(boidNormals, 27);
 
     shared_ptr<Object> o = make_shared<Object>();
     o->AttachBuffer(0, boidVertexBuffer);
-    o->AttachBuffer(1, boidNormalBuffer);
 
     for (unsigned int i = 0; i < NUM_BOIDS; ++i)
     {
@@ -84,7 +69,7 @@ void SwarmWorld::Init(shared_ptr<Renderer> renderer)
         b->renderObject = make_shared<RenderObject>();
         b->renderObject->object = o;
         b->renderObject->program = "basic|basic";
-        b->renderObject->colour[0] = b->renderObject->colour[1] = b->renderObject->colour[2] = 1.f;
+        b->renderObject->colour[0] = b->renderObject->colour[1] = b->renderObject->colour[2] = 0.f;
 
         boids_.push_back(b);
     }
@@ -164,14 +149,7 @@ void SwarmWorld::Draw(shared_ptr<Renderer> renderer)
 {
     for (auto b : boids_)
     {
-        //if (ermergerd_ > 0)
-        //    b->renderObject->colour[0] = b->renderObject->colour[1] = b->renderObject->colour[2] = 1;
-        //else
-            b->renderObject->colour[0] = b->renderObject->colour[1] = b->renderObject->colour[2] = 0;
-
-        // TODO: get animation value into shaders :-/
         b->renderObject->colour[2] = b->anim;
-
         renderer->Draw(b->renderObject);
     }
 }

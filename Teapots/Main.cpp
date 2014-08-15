@@ -52,67 +52,6 @@ float cubeVerts[] = {   -0.5f,  0.5f,   0.5f,
 
 };
 
-float cubeNormals[] = { -1, 0, 0,
-                        -1, 0, 0,
-                        -1, 0, 0,
-                        -1, 0, 0,
-                        -1, 0, 0,
-                        -1, 0, 0,
-
-                        1, 0, 0,
-                        1, 0, 0,
-                        1, 0, 0,
-                        1, 0, 0,
-                        1, 0, 0,
-                        1, 0, 0,
-
-                        0, 0, -1,
-                        0, 0, -1,
-                        0, 0, -1,
-                        0, 0, -1,
-                        0, 0, -1,
-                        0, 0, -1,
-
-                        0, 0, 1,
-                        0, 0, 1,
-                        0, 0, 1,
-                        0, 0, 1,
-                        0, 0, 1,
-                        0, 0, 1,
-
-                        0, -1, 0,
-                        0, -1, 0,
-                        0, -1, 0,
-                        0, -1, 0,
-                        0, -1, 0,
-                        0, -1, 0,
-
-                        0, 1, 0,
-                        0, 1, 0,
-                        0, 1, 0,
-                        0, 1, 0,
-                        0, 1, 0,
-                        0, 1, 0
-};
-
-float planeVerts[] = { 
-    -20, -20, 0,
-    -20, 20, 0,
-    20, 20, 0,
-    20, 20, 0,
-    20, -20, 0,
-    -20, -20, 0
-};
-
-float planeNormals[] = {
-    0, 0, -1,
-    0, 0, -1,
-    0, 0, -1,
-    0, 0, -1,
-    0, 0, -1,
-    0, 0, -1,
-};
-
 #include "wt_teapot.obj.h"
 
 class TeapotWorld : public World
@@ -142,15 +81,10 @@ void TeapotWorld::Init(shared_ptr<Renderer> renderer)
     shared_ptr<Buffer> cubeVertexBuffer = make_shared<Buffer>();
     shared_ptr<Buffer> cubeNormalBuffer = make_shared<Buffer>();
 
-    for (int i = 0; i < 108; ++i)
-        cubeNormals[i] *= -1;
-
     cubeVertexBuffer->SetData(cubeVerts, 108);
-    cubeNormalBuffer->SetData(cubeNormals, 108);
 
     shared_ptr<Object> c = make_shared<Object>();
     c->AttachBuffer(0, cubeVertexBuffer);
-    c->AttachBuffer(1, cubeNormalBuffer);
 
     cube_ = make_shared<RenderObject>();
     cube_->object = c;
