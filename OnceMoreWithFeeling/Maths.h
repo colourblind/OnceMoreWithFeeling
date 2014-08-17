@@ -319,6 +319,28 @@ namespace OnceMoreWithFeeling
             return m * (1.0f / d);
         }
 
+        Matrix inline Transpose()
+        {
+            Matrix m(*this);
+            m.a[0][0] = a[0][0];
+            m.a[0][1] = a[1][0];
+            m.a[0][2] = a[2][0];
+            m.a[0][3] = a[3][0];
+            m.a[1][0] = a[0][1];
+            m.a[1][1] = a[1][1];
+            m.a[1][2] = a[2][1];
+            m.a[1][3] = a[3][1];
+            m.a[2][0] = a[0][2];
+            m.a[2][1] = a[1][2];
+            m.a[2][2] = a[2][2];
+            m.a[2][3] = a[3][2];
+            m.a[3][0] = a[0][3];
+            m.a[3][1] = a[1][3];
+            m.a[3][2] = a[2][3];
+            m.a[3][3] = a[3][3];
+            return m;
+        }
+
         Matrix inline operator *(float scale)
         {
             Matrix m = Matrix(*this);

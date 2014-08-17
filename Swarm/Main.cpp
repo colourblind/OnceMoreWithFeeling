@@ -16,15 +16,15 @@ const float RESPONSIVENESS = 0.000002f;
 const float WING_BEAT_SPEED = 0.003f;
 
 float boidVerts[] = {
-    -0.2f, 0.0f, -0.4f,
-    0.2f, 0.0f, -0.4f,
+    -0.2f, 0.0f, 0.4f,
+    0.2f, 0.0f, 0.4f,
     0, 0, 0,
     0, 0, 0,
-    -0.65f, 0.5f, 0.25f,
-    0, 0, 0.5f,
+    -0.65f, 0.5f, -0.25f,
+    0, 0, -0.5f,
     0, 0, 0,
-    0.65f, 0.5f, 0.25f,
-    0, 0, 0.5f
+    0.65f, 0.5f, -0.25f,
+    0, 0, -0.5f
 };
 
 float cubeVerts[] = { 
@@ -92,6 +92,7 @@ private:
     float ermergerd_;
     shared_ptr<RenderObject> skybox_;
     GLuint skyboxTexture_;
+    Vector swarmCentre_;
 };
 
 void SwarmWorld::Init(shared_ptr<Renderer> renderer)
@@ -136,7 +137,7 @@ void SwarmWorld::Init(shared_ptr<Renderer> renderer)
 
     renderer->SetUniform("skybox|skybox", 0, 0);
 
-    renderer->SetCameraPosition(Vector(0, -2, 7));
+    renderer->SetCameraPosition(Vector(0, -3, 7));
     renderer->SetCameraLookAt(Vector(0, 0, 0));
 
     glDisable(GL_CULL_FACE);
@@ -147,6 +148,8 @@ void SwarmWorld::Upate(float msecs)
     // Freak out time!
     if (RandF(0, 1) > 0.998f)
         ermergerd_ = 250;
+
+    swarmCentre_ = Vector();
 
     for (unsigned int i = 0; i < boids_.size(); ++i)
     {
@@ -197,10 +200,12 @@ void SwarmWorld::Upate(float msecs)
             current->velocity = current->velocity.Normalise() * MAX_SPEED;
         current->position = current->position + current->velocity * msecs;
 
+        swarmCentre_ = swarmCentre_ + current->position * (1.f /  boids_.size());
+
         // Use our camera view transformation to align the 'mesh' to
         // its velocity vector
         Matrix align = Matrix::Camera(Vector(), current->velocity);
-        current->renderObject->transformation = Matrix::Translate(current->position) * align * Matrix::Scale(0.1f);
+        current->renderObject->transformation = Matrix::Translate(current->position) * align.Transpose() * Matrix::Scale(0.1f);
 
         current->anim += WING_BEAT_SPEED * msecs;
         if (current->anim > 1)
@@ -212,6 +217,8 @@ void SwarmWorld::Upate(float msecs)
 
 void SwarmWorld::Draw(shared_ptr<Renderer> renderer)
 {
+    renderer->SetCameraLookAt(swarmCentre_);
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, skyboxTexture_);
 
