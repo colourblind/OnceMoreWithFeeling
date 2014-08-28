@@ -3,7 +3,6 @@
 #include "Window.h"
 #include "Renderer.h"
 #include "World.h"
-#include "Texture.h"
 #include "Noise.h"
 
 using namespace OnceMoreWithFeeling;
@@ -41,7 +40,6 @@ public:
 private:
     vector<shared_ptr<RenderObject>> fluffs_; 
     vector<Vector> fluffNormals_;
-    GLuint cloudTexture_;
     float flashTime_;
     Vector flashPosition_;
     float lightRotation_;
@@ -100,7 +98,7 @@ void CloudNineWorld::Init(shared_ptr<Renderer> renderer)
         fluffs_[i] = ouch[i].second;
     }
     
-    cloudTexture_ = LoadTexture("clouds.png");
+    renderer->AddTexture("clouds.png");
 
     flashTime_ = 0;
     lightRotation_ = 0;
@@ -144,9 +142,9 @@ void CloudNineWorld::Draw(shared_ptr<Renderer> renderer)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, cloudTexture_);
-    renderer->SetUniform("fluff|fluff", 4, 0);
+    unordered_map<unsigned int, string> bindings;
+    bindings.insert(make_pair(4, "clouds.png"));
+    renderer->SetTextures("fluff|fluff", bindings);
 
     int fluffIndex = 0;
     for (auto fluff : fluffs_)

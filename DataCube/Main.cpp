@@ -6,7 +6,6 @@
 #include "Window.h"
 #include "Renderer.h"
 #include "World.h"
-#include "Texture.h"
 
 using namespace OnceMoreWithFeeling;
 using namespace std;

@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "Texture.h"
 
 #include <sstream>
 
@@ -29,7 +30,7 @@ void main()\
 }";
 
 Renderer::Renderer() : font_(), frameCount_(0), fps_(0), 
-cameraPosition_(0, 0, 7), cameraLookAt_(0, 0, 0)
+    cameraPosition_(0, 0, 7), cameraLookAt_(0, 0, 0)
 {
     shared_ptr<ShaderProgram> textProgram = make_shared<ShaderProgram>();
     textProgram->Build(TEXT_VERTEX_SOURCE, TEXT_FRAGMENT_SOURCE);
@@ -40,6 +41,8 @@ Renderer::~Renderer()
 {
     for (auto shader : shaders_)
         glDeleteProgram(shader.second->Handle());
+    for (auto texture : textures_)
+        glDeleteTextures(1, &texture.second.second);
 }
 
 void Renderer::StartFrame()
@@ -119,7 +122,6 @@ void Renderer::Draw(shared_ptr<RenderObject> renderObject, GLenum type)
     GLint v = glGetUniformLocation(program->Handle(), "v");
     GLint p = glGetUniformLocation(program->Handle(), "p");
     GLint c = glGetUniformLocation(program->Handle(), "colour");
-    GLint environment = glGetUniformLocation(program->Handle(), "environment");
 
     glUniformMatrix4fv(m, 1, GL_FALSE, renderObject->transformation.gl());
     glUniformMatrix4fv(v, 1, GL_FALSE, view_.gl());
@@ -138,23 +140,48 @@ void Renderer::AddShader(string vertexShaderName, string fragmentShaderName)
     shaders_.insert(make_pair(name, program));
 }
 
+void Renderer::AddTexture(string textureName)
+{
+    GLuint handle = LoadTexture(textureName);
+    textures_.insert(make_pair(textureName, make_pair(GL_TEXTURE_2D, handle)));
+}
+
+void Renderer::AddCubeTexture(string textureName, vector<string> filenames)
+{
+    GLuint handle = LoadCubeTexture(filenames);
+    textures_.insert(make_pair(textureName, make_pair(GL_TEXTURE_CUBE_MAP, handle)));
+}
+
 void Renderer::SetWindowSize(unsigned int width, unsigned int height)
 {
     width_ = width;
     height_ = height;
 }
 
-void Renderer::SetUniform(std::string program, int location, int value)
+void Renderer::SetUniform(string program, int location, int value)
 {
     glProgramUniform1i(shaders_[program]->Handle(), location, value);
 }
 
-void Renderer::SetUniform(std::string program, int location, float value)
+void Renderer::SetUniform(string program, int location, float value)
 {
     glProgramUniform1f(shaders_[program]->Handle(), location, value);
 }
 
-void Renderer::SetUniform(std::string program, int location, Vector value)
+void Renderer::SetUniform(string program, int location, Vector value)
 {
     glProgramUniform3fv(shaders_[program]->Handle(), location, 1, value.gl());
+}
+
+void Renderer::SetTextures(string program, unordered_map<unsigned int, string> bindings)
+{
+    auto shader = shaders_[program];
+    int i = 0;
+    for (auto binding : bindings)
+    {
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(textures_[binding.second].first, textures_[binding.second].second);
+        glProgramUniform1i(shader->Handle(), binding.first, i);
+        i++;
+    }
 }

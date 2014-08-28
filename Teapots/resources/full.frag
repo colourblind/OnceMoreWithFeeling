@@ -9,11 +9,11 @@ layout(location = 0) out vec4 fragColour;
 uniform mat4 v;
 
 uniform vec3 colour;
-layout(location = 0) uniform float specular;
-layout(location = 1) uniform float shininess;
-layout(location = 2) uniform float reflectiveness;
+layout(location = 0) uniform samplerCube environment;
+layout(location = 1) uniform float specular;
+layout(location = 2) uniform float shininess;
+layout(location = 3) uniform float reflectiveness;
 
-uniform samplerCube environment;
 
 void main()
 {

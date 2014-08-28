@@ -7,7 +7,6 @@ Cube maps stolen from Humus (www.humus.name)
 
 TODO
 
-Un-hack environment mapping
 Shadows
 Fog?
 Normal mapping?

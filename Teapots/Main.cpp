@@ -3,7 +3,6 @@
 #include "Window.h"
 #include "Renderer.h"
 #include "World.h"
-#include "Texture.h"
 
 using namespace OnceMoreWithFeeling;
 using namespace std;
@@ -67,7 +66,7 @@ private:
     vector<shared_ptr<RenderObject>> teapots_;
     vector<float> reflectiveness_;
     shared_ptr<RenderObject> cube_;
-    GLuint environmentTexture_;
+    unordered_map<unsigned int, string> textureBindings_;
 };
 
 void TeapotWorld::Init(shared_ptr<Renderer> renderer)
@@ -75,8 +74,8 @@ void TeapotWorld::Init(shared_ptr<Renderer> renderer)
     renderer->AddShader("full", "full");
     renderer->AddShader("skybox", "skybox");
 
-    renderer->SetUniform("full|full", 0, 1.f); // specular
-    renderer->SetUniform("full|full", 1, 128.f); // shininess
+    renderer->SetUniform("full|full", 1, 1.f); // specular
+    renderer->SetUniform("full|full", 2, 128.f); // shininess
 
     shared_ptr<Buffer> cubeVertexBuffer = make_shared<Buffer>();
     shared_ptr<Buffer> cubeNormalBuffer = make_shared<Buffer>();
@@ -118,9 +117,9 @@ void TeapotWorld::Init(shared_ptr<Renderer> renderer)
     }
 
     vector<string> environment = { "posx.jpg", "negx.jpg", "posy.jpg", "negy.jpg", "posz.jpg", "negz.jpg" };
-    environmentTexture_ = LoadCubeTexture(environment);
+    renderer->AddCubeTexture("environment", environment);
 
-    renderer->SetUniform("skybox|skybox", 0, 0); // environment
+    textureBindings_.insert(make_pair(0, "environment"));
 }
 
 void TeapotWorld::Upate(float msecs)
@@ -145,14 +144,13 @@ void TeapotWorld::Upate(float msecs)
 
 void TeapotWorld::Draw(shared_ptr<Renderer> renderer)
 {
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, environmentTexture_);
-
+    renderer->SetTextures("skybox|skybox", textureBindings_);
     renderer->Draw(cube_);
 
+    renderer->SetTextures("full|full", textureBindings_);
     for (unsigned int i = 0; i < teapots_.size(); ++i)
     {
-        renderer->SetUniform("full|full", 2, reflectiveness_[i]);
+        renderer->SetUniform("full|full", 3, reflectiveness_[i]);
         renderer->Draw(teapots_[i]);
     }
 }

@@ -34,6 +34,8 @@ namespace OnceMoreWithFeeling
         void SetCameraLookAt(Vector cameraLookAt) { cameraLookAt_ = cameraLookAt; }
 
         void AddShader(std::string vertexShaderName, std::string fragmentShaderName);
+        void AddTexture(std::string textureName);
+        void AddCubeTexture(std::string textureName, std::vector<std::string> filenames);
         void SetWindowSize(unsigned int width, unsigned int height);
         void ResetFrameCount() { fps_ = frameCount_; frameCount_ = 0; }
 
@@ -41,8 +43,11 @@ namespace OnceMoreWithFeeling
         void SetUniform(std::string program, int location, float value);
         void SetUniform(std::string program, int location, Vector value);
 
+        void SetTextures(std::string program, std::unordered_map<unsigned int, std::string> binding);
+
     protected:
         std::unordered_map<std::string, std::shared_ptr<ShaderProgram>> shaders_;
+        std::unordered_map<std::string, std::pair<GLenum, GLuint>> textures_;
         unsigned int width_;
         unsigned int height_;
         Font font_;

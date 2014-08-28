@@ -3,7 +3,6 @@
 #include "Window.h"
 #include "Renderer.h"
 #include "World.h"
-#include "Texture.h"
 
 using namespace OnceMoreWithFeeling;
 using namespace std;
@@ -133,7 +132,7 @@ void SwarmWorld::Init(shared_ptr<Renderer> renderer)
     skybox_->program = "skybox|skybox";
 
     vector<string> skyboxFilenames = { "posx.png", "negx.png", "posy.png", "negy.png", "posz.png", "negz.png" };
-    skyboxTexture_ = LoadCubeTexture(skyboxFilenames);
+    renderer->AddCubeTexture("skybox", skyboxFilenames);
 
     renderer->SetUniform("skybox|skybox", 0, 0);
 
@@ -219,8 +218,9 @@ void SwarmWorld::Draw(shared_ptr<Renderer> renderer)
 {
     renderer->SetCameraLookAt(swarmCentre_);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, skyboxTexture_);
+    unordered_map<unsigned int, string> bindings;
+    bindings.insert(make_pair(0, "skybox"));
+    renderer->SetTextures("skybox|skybox", bindings);
 
     glDepthMask(GL_FALSE);
     renderer->Draw(skybox_);
