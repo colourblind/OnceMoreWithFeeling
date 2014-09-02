@@ -3,7 +3,8 @@ load of dependencies, and without falling down the framework rabbit-hole.
 
 CREDITS
 
-Cube maps stolen from Humus (www.humus.name)
+Teapots cube map stolen from Emil 'Humus' Persson
+Swarm cube map stolen from Jockum 'Hipshot' Skoglund
 
 TODO
 

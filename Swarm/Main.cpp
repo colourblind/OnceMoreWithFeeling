@@ -131,7 +131,7 @@ void SwarmWorld::Init(shared_ptr<Renderer> renderer)
     skybox_->object = skyboxObject;
     skybox_->program = "skybox|skybox";
 
-    vector<string> skyboxFilenames = { "posx.png", "negx.png", "posy.png", "negy.png", "posz.png", "negz.png" };
+    vector<string> skyboxFilenames = { "posx.jpg", "negx.jpg", "posy.jpg", "negy.jpg", "posz.jpg", "negz.jpg" };
     renderer->AddCubeTexture("skybox", skyboxFilenames);
 
     renderer->SetUniform("skybox|skybox", 0, 0);
