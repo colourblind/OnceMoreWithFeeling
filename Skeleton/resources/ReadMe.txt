@@ -1,0 +1,1 @@
+This is a project stub for creating new projects using tools/create_project.py
