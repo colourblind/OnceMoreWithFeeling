@@ -106,21 +106,21 @@
     <ClInclude Include="FontData.h" />
     <ClInclude Include="Fonts.h" />
     <ClInclude Include="Maths.h" />
-    <ClInclude Include="Noise.h" />
     <ClInclude Include="Objects.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Utils.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fonts.cpp" />
-    <ClCompile Include="Noise.cpp" />
     <ClCompile Include="Objects.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

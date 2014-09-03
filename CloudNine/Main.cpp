@@ -3,7 +3,6 @@
 #include "Window.h"
 #include "Renderer.h"
 #include "World.h"
-#include "Noise.h"
 
 using namespace OnceMoreWithFeeling;
 using namespace std;
