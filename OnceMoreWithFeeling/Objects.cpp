@@ -28,7 +28,7 @@ void Object::AttachBuffer(int attribLocation, shared_ptr<Buffer> buffer, unsigne
     glVertexAttribPointer(attribLocation, size, GL_FLOAT, GL_FALSE, 0, 0);
     buffer->Deactivate();
     Deactivate();
-    count_ = buffer->GetSize();
+    count_ = buffer->GetSize() / size;
     // Not sure if this is strictly necessary . . .
     buffers_.push_back(buffer);
 }
