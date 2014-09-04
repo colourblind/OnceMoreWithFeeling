@@ -321,7 +321,7 @@ namespace OnceMoreWithFeeling
 
         Matrix inline Transpose()
         {
-            Matrix m(*this);
+            Matrix m;
             m.a[0][0] = a[0][0];
             m.a[0][1] = a[1][0];
             m.a[0][2] = a[2][0];
@@ -544,6 +544,34 @@ namespace OnceMoreWithFeeling
             m.a[3][2] = 2 * (farClip * nearClip) / (nearClip - farClip);
             m.a[3][3] = 0;
             return m;
+        }
+
+        static Matrix Billboard(Vector eye, Vector target)
+        {
+            Vector up = Vector(0, 1, 0);
+            Vector zaxis = (target - eye).Normalise();
+            Vector xaxis = Vector::Cross(zaxis, up).Normalise();
+            Vector yaxis = Vector::Cross(xaxis, zaxis).Normalise();
+
+            Matrix m;
+            m.a[0][0] = xaxis.x;
+            m.a[1][0] = xaxis.y;
+            m.a[2][0] = xaxis.z;
+            m.a[3][0] = 0;
+            m.a[0][1] = yaxis.x;
+            m.a[1][1] = yaxis.y;
+            m.a[2][1] = yaxis.z;
+            m.a[3][1] = 0;
+            m.a[0][2] = -zaxis.x;
+            m.a[1][2] = -zaxis.y;
+            m.a[2][2] = -zaxis.z;
+            m.a[3][2] = 0;
+            m.a[0][3] = 0;
+            m.a[1][3] = 0;
+            m.a[2][3] = 0;
+            m.a[3][3] = 1;
+
+            return m.Transpose();
         }
 
         static Matrix Ortho(float width, float height)
