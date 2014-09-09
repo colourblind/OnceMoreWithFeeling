@@ -1,5 +1,5 @@
 #include "Utils.h"
-#include "Maths.h"
+#include <algorithm>
 
 using namespace OnceMoreWithFeeling;
 using namespace std;
@@ -37,4 +37,47 @@ void OnceMoreWithFeeling::CreateNoise(vector<float> &data, int octaves, int widt
             }
         }
     }
+}
+
+Spline::Spline(std::vector<Vector> &points) : points_(points)
+{
+    int numPoints = points_.size();
+    points_.push_back(points_[numPoints - 1]);
+    points_.insert(points_.begin(), points_[0]);
+}
+
+Vector Spline::Get(float f)
+{
+    int maxIndex = points_.size() - 1;
+    int scale = points_.size() - 2;
+    float norm = (f * scale) + 1;
+    int index = static_cast<int>(floor(norm));
+    float offset = norm - index;
+
+    int i0 = index - 1;
+    int i1 = index;
+    int i2 = min(maxIndex, index + 1);
+    int i3 = min(maxIndex, index + 2);
+
+    Vector p0 = points_[i0];
+    Vector p1 = points_[i1];
+    Vector p2 = points_[i2];
+    Vector p3 = points_[i3];
+
+    return (
+        (p1 * 2) +
+        (p0 * -1 + p2) * offset +
+        (p0 * 2 - p1 * 5 + p2 * 4 - p3) * offset * offset +
+        (p0 * -1 + p1 * 3 - p2 * 3 + p3) * offset * offset * offset
+    ) * 0.5f;
+}
+
+vector<Vector> Spline::GetPoints(unsigned int count)
+{
+    vector<Vector> result;
+    float step = 1.f / (count - 1);
+    float f = 0;
+    for (unsigned int i = 0; i < count; i++, f += step)
+        result.push_back(Get(f));
+    return result;
 }
