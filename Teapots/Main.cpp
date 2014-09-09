@@ -66,7 +66,6 @@ private:
     vector<shared_ptr<RenderObject>> teapots_;
     vector<float> reflectiveness_;
     shared_ptr<RenderObject> cube_;
-    unordered_map<unsigned int, string> textureBindings_;
 };
 
 void TeapotWorld::Init(shared_ptr<Renderer> renderer)
@@ -90,6 +89,7 @@ void TeapotWorld::Init(shared_ptr<Renderer> renderer)
     cube_->program = "skybox|skybox";
     cube_->transformation = Matrix::Scale(30, 12, 30);
     cube_->colour[0] = cube_->colour[1] = cube_->colour[2] = 1;
+    cube_->textureBindings.insert(make_pair(0, "environment"));
 
     shared_ptr<Buffer> teapotVertexBuffer = make_shared<Buffer>();
     shared_ptr<Buffer> teapotNormalBuffer = make_shared<Buffer>();
@@ -109,6 +109,7 @@ void TeapotWorld::Init(shared_ptr<Renderer> renderer)
         teapot->colour[0] = RandF(0, 1);
         teapot->colour[1] = RandF(0, 1);
         teapot->colour[2] = RandF(0, 1);
+        teapot->textureBindings.insert(make_pair(0, "environment"));
         teapots_.push_back(teapot);
 
         rotation_.push_back(Vector(RandF(0, PI), RandF(0, PI), RandF(0, PI)));
@@ -118,8 +119,6 @@ void TeapotWorld::Init(shared_ptr<Renderer> renderer)
 
     vector<string> environment = { "posx.jpg", "negx.jpg", "posy.jpg", "negy.jpg", "posz.jpg", "negz.jpg" };
     renderer->AddCubeTexture("environment", environment);
-
-    textureBindings_.insert(make_pair(0, "environment"));
 }
 
 void TeapotWorld::Upate(float msecs)
@@ -144,10 +143,8 @@ void TeapotWorld::Upate(float msecs)
 
 void TeapotWorld::Draw(shared_ptr<Renderer> renderer)
 {
-    renderer->SetTextures("skybox|skybox", textureBindings_);
     renderer->Draw(cube_);
 
-    renderer->SetTextures("full|full", textureBindings_);
     for (unsigned int i = 0; i < teapots_.size(); ++i)
     {
         renderer->SetUniform("full|full", 3, reflectiveness_[i]);

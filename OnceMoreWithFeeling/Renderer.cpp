@@ -128,6 +128,9 @@ void Renderer::Draw(shared_ptr<RenderObject> renderObject, GLenum type)
     glUniformMatrix4fv(p, 1, GL_FALSE, projection_.gl());
     glUniform3fv(c, 1, renderObject->colour);
 
+    if (renderObject->textureBindings.size() > 0)
+        SetTextures(renderObject->program, renderObject->textureBindings);
+
     renderObject->object->Draw(type);
 }
 

@@ -18,6 +18,7 @@ namespace OnceMoreWithFeeling
         std::string program;
         Matrix transformation;
         float colour[3];
+        std::unordered_map<unsigned int, std::string> textureBindings;
     };
 
     class Renderer

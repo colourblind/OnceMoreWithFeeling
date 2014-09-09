@@ -130,11 +130,10 @@ void SwarmWorld::Init(shared_ptr<Renderer> renderer)
     skybox_ = make_shared<RenderObject>();
     skybox_->object = skyboxObject;
     skybox_->program = "skybox|skybox";
+    skybox_->textureBindings.insert(make_pair(0, "skybox"));
 
     vector<string> skyboxFilenames = { "posx.jpg", "negx.jpg", "posy.jpg", "negy.jpg", "posz.jpg", "negz.jpg" };
     renderer->AddCubeTexture("skybox", skyboxFilenames);
-
-    renderer->SetUniform("skybox|skybox", 0, 0);
 
     renderer->SetCameraPosition(Vector(0, -3, 7));
     renderer->SetCameraLookAt(Vector(0, 0, 0));
@@ -217,10 +216,6 @@ void SwarmWorld::Upate(float msecs)
 void SwarmWorld::Draw(shared_ptr<Renderer> renderer)
 {
     renderer->SetCameraLookAt(swarmCentre_);
-
-    unordered_map<unsigned int, string> bindings;
-    bindings.insert(make_pair(0, "skybox"));
-    renderer->SetTextures("skybox|skybox", bindings);
 
     glDepthMask(GL_FALSE);
     renderer->Draw(skybox_);

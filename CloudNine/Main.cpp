@@ -73,6 +73,7 @@ void CloudNineWorld::Init(shared_ptr<Renderer> renderer)
             fluff->program = "fluff|fluff";
             fluff->transformation = Matrix::Translate(position) * Matrix::Translate(fluffPosition) * Matrix::Scale(RandF(2, 10)) * Matrix::Rotate(0, 0, RandF(0, PI * 2));
             fluff->colour[0] = colour;
+            fluff->textureBindings.insert(make_pair(4, "clouds.png"));
             fluffs_.push_back(fluff);
 
             fluffNormals_.push_back(fluffPosition.Normalise());
@@ -140,10 +141,6 @@ void CloudNineWorld::Draw(shared_ptr<Renderer> renderer)
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    unordered_map<unsigned int, string> bindings;
-    bindings.insert(make_pair(4, "clouds.png"));
-    renderer->SetTextures("fluff|fluff", bindings);
 
     int fluffIndex = 0;
     for (auto fluff : fluffs_)
