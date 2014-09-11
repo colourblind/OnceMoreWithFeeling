@@ -16,6 +16,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CloudNine", "CloudNine\Clou
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataCube", "DataCube\DataCube.vcxproj", "{3BDA7B37-B0D6-453B-B3AA-C359052126F7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HexField", "HexField\HexField.vcxproj", "{7667C322-4C40-4027-9246-58DCB50F884B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -42,6 +44,10 @@ Global
 		{3BDA7B37-B0D6-453B-B3AA-C359052126F7}.Debug|Win32.Build.0 = Debug|Win32
 		{3BDA7B37-B0D6-453B-B3AA-C359052126F7}.Release|Win32.ActiveCfg = Release|Win32
 		{3BDA7B37-B0D6-453B-B3AA-C359052126F7}.Release|Win32.Build.0 = Release|Win32
+		{7667C322-4C40-4027-9246-58DCB50F884B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7667C322-4C40-4027-9246-58DCB50F884B}.Debug|Win32.Build.0 = Debug|Win32
+		{7667C322-4C40-4027-9246-58DCB50F884B}.Release|Win32.ActiveCfg = Release|Win32
+		{7667C322-4C40-4027-9246-58DCB50F884B}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
