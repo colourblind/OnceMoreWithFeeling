@@ -5,7 +5,9 @@
 
 namespace OnceMoreWithFeeling
 {
-    void CreateNoise(std::vector<float> &data, int octaves, int width, int height, int depth);
+    void CreateNoise(std::vector<float> &data, int octaves, int width, int height);
+    float Lerp(float a, float b, float t);
+    float Coserp(float a, float b, float t);
 
     class Spline
     {

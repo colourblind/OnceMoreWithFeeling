@@ -4,39 +4,66 @@
 using namespace OnceMoreWithFeeling;
 using namespace std;
 
-void FillCube(vector<float> &data, float value, int x, int y, int z, int width, int height, int depth, int size)
+// We're avoiding the usual rand functions since we need coherent noise
+// and don't want to mess around with seeds and potentially break other
+// parts of the code
+float Noise(int x, int y)
 {
-    for (int i = x; i < x + size; ++i)
+    int n = x + y * 57;
+    n = (n << 13) ^ n;
+    return (0.5f * static_cast<float>((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.f);
+}
+
+// Coherent noise with cosine interpolation
+float SmoothNoise(float x, float y)
+{
+    int fx = static_cast<int>(floor(x));
+    int fy = static_cast<int>(floor(y));
+
+    float v = Noise(fx, fy);
+    float vx = Noise(fx + 1, fy);
+    float vy = Noise(fx, fy + 1);
+    float vxy = Noise(fx + 1, fy + 1);
+
+    float tx = x - fx;
+    float ty = y - fy;
+    float i0 = Coserp(v, vx, tx);
+    float i1 = Coserp(vy, vxy, tx);
+    return Coserp(i0, i1, ty);
+}
+
+// Fractal Brownian Motion
+void OnceMoreWithFeeling::CreateNoise(vector<float> &data, int octaves, int width, int height)
+{
+    data.resize(width * height, 0);
+    
+    for (int y = 0; y < height; ++y)
     {
-        for (int j = y; j < y + size; ++j)
+        for (int x = 0; x < width; ++x)
         {
-            for (int k = z; k < z + size; ++k)
+            float frequency = 1.f / max(width, height);
+            float amplitude = 0.5f;
+            float result = 0;
+            for (int o = 0; o < octaves; ++o)
             {
-                data[i * width * height + j * height + k] += value;
+                result += SmoothNoise(static_cast<float>(x) * frequency, static_cast<float>(y) * frequency) * amplitude;
+                frequency *= 2;
+                amplitude *= 0.5f;
             }
+            data[y * width + x] = result;
         }
     }
 }
 
-void OnceMoreWithFeeling::CreateNoise(vector<float> &data, int octaves, int width, int height, int depth)
+float OnceMoreWithFeeling::Lerp(float a, float b, float t)
 {
-    data.resize(width * height * depth, 0);
+    return a * (1.f - t) + b * t;
+}
 
-    for (int o = 0; o < octaves; ++o)
-    {
-        int step = static_cast<int>(powf(2, static_cast<float>(o)));
-        float max = 1.f / powf(2, static_cast<float>(octaves - o));
-        for (int x = 0; x < width; x += step)
-        {
-            for (int y = 0; y < height; y += step)
-            {
-                for (int z = 0; z < depth; z += step)
-                {
-                    FillCube(data, RandF(0, max), x, y, z, width, height, depth, step);
-                }
-            }
-        }
-    }
+float OnceMoreWithFeeling::Coserp(float a, float b, float t)
+{
+    float c = (1.f + cos(t * PI)) * 0.5f;
+    return a * c + b * (1.f - c);
 }
 
 Spline::Spline(std::vector<Vector> &points) : points_(points)
