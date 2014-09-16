@@ -107,6 +107,9 @@ Window::Window(HINSTANCE instance, int show) : width_(640), height_(480)
     {
         // Crash and burn, you luddite
     }
+
+    // Turn off vsync
+    ::wglSwapIntervalEXT(0);
 }
 
 Window::~Window()
