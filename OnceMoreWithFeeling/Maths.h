@@ -593,4 +593,11 @@ namespace OnceMoreWithFeeling
     {
         return (static_cast<float>(rand()) / RAND_MAX) * (max - min) + min;
     }
+
+    static int RandI(int min, int max)
+    {
+        // This is a horrible hack. But it's not like we're doing crypto
+        float maxf = max + (max >= 0 ? 0.999f : -0.999f);
+        return static_cast<int>(floor(RandF(static_cast<float>(min), maxf)));
+    }
 }

@@ -22,7 +22,8 @@ private:
 const float PADDING = 0.1f;
 const int COUNT_Y = 64;
 const int COUNT_X = 32;
-const float ROTATION_SPEED = 0.001f;
+const float ROTATION_SPEED = 0.0025f;
+const float SPAWN_CHANCE = 0.1f;        // Smaller makes a spawn more likely on each tick
 
 float hexPoints[] = {
     1, 0, 0,
@@ -66,10 +67,9 @@ void HexFieldWorld::Init(shared_ptr<Renderer> renderer)
             hexObject->colour[0] = 1 * noiseValue;
             hexObject->colour[1] = 0.9f * noiseValue;
             hexObject->colour[2] = 0.1f * noiseValue;
-            hexObject->transformation = Matrix::Scale(0.1f) * Matrix::Translate(Vector(x * (3.f + PADDING * 2) + offset, y * (0.866f + PADDING), 0)) * Matrix::Translate(Vector((-COUNT_X / 2) * (3.f + PADDING * 2), (-COUNT_Y / 2) * (0.866f + PADDING), 0));
             hexes_.push_back(hexObject);
 
-            rotations_.push_back(RandF(0, 2 * PI));
+            rotations_.push_back(-1);
         }
     }
 }
@@ -82,18 +82,105 @@ void HexFieldWorld::Upate(float msecs)
         for (int x = 0; x < COUNT_X; ++x)
         {
             int i = y * COUNT_X + x;
-            rotations_[i] += ROTATION_SPEED * msecs;
-            if (rotations_[i] > 2 * PI)
-                rotations_[i] -= 2 * PI;
-            hexes_[i]->transformation = Matrix::Scale(0.1f) * Matrix::Translate(Vector(x * (3.f + PADDING * 2) + offset, y * (0.866f + PADDING), 0)) * Matrix::Translate(Vector((-COUNT_X / 2) * (3.f + PADDING * 2), (-COUNT_Y / 2) * (0.866f + PADDING), 0)) * Matrix::Rotate(0, rotations_[i], 0);
+            float r = rotations_[i];
+            if (r >= 0)
+            {
+                r = r + ROTATION_SPEED * msecs;
+                if (r > PI)
+                    r = -1;
+                else if (rotations_[i] < PI / 4 && r > PI / 4)
+                {
+                    int numBranches = RandI(0, 2);
+                    for (int n = 0; n < numBranches; ++ n)
+                    {
+                        // Select attached hex and start that one moving, if available
+                        int selectionOffset = RandI(0, 5);
+                        for (int j = 0; j < 6; ++j)
+                        {
+                            int x0, y0;
+                            switch ((selectionOffset + j) % 6)
+                            {
+                                case 0:
+                                    x0 = -1;
+                                    y0 = -1;
+                                    break;
+                                case 1:
+                                    x0 = 0;
+                                    y0 = -1;
+                                    break;
+                                case 2:
+                                    x0 = -1;
+                                    y0 = 1;
+                                    break;
+                                case 3:
+                                    x0 = 0;
+                                    y0 = 1;
+                                    break;
+                                case 4:
+                                    x0 = 0;
+                                    y0 = -2;
+                                    break;
+                                case 5:
+                                    x0 = 0;
+                                    y0 = 2;
+                                    break;
+                            }
+                            int f = (y + y0) * COUNT_X + (x + x0);
+                            if (f < 0 || f >= COUNT_X * COUNT_Y)
+                                continue;
+                            if (rotations_[f] < 0)
+                            {
+                                rotations_[f] = 0;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (r >= 0)
+                hexes_[i]->transformation = Matrix::Scale(0.1f) * Matrix::Translate(Vector(x * (3.f + PADDING * 2) + offset, y * (0.866f + PADDING), 0)) * Matrix::Translate(Vector((-COUNT_X / 2) * (3.f + PADDING * 2), (-COUNT_Y / 2) * (0.866f + PADDING), 0)) * Matrix::Rotate(0, r - PI / 2, 0);
+            rotations_[i] = r;
+        }
+    }
+
+    if (RandF(0, SPAWN_CHANCE) < msecs / 1000)
+    {
+        int c = 0;
+        int x = static_cast<int>(RandF(0, static_cast<float>(COUNT_X)));
+        int y = static_cast<int>(RandF(0, static_cast<float>(COUNT_Y)));
+        int i = y * COUNT_X + x;
+        while (c < 20 && rotations_[i] >= 0)
+        {
+            x = static_cast<int>(RandF(0, static_cast<float>(COUNT_X)));
+            y = static_cast<int>(RandF(0, static_cast<float>(COUNT_Y)));
+            i = y * COUNT_X + x;
+            c ++;
+        }
+        if (c < 20)
+        {
+            rotations_[i] = 0;
         }
     }
 }
 
 void HexFieldWorld::Draw(shared_ptr<Renderer> renderer)
 {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    int i = 0;
     for (auto hex : hexes_)
-        renderer->Draw(hex);
+    {
+        // This deliberately ignores 0, so we don't draw a hex without it's
+        // transformation initialised
+        if (rotations_[i] > 0) 
+        {
+            renderer->SetUniform(hex->program, 0, rotations_[i]);
+            renderer->Draw(hex);
+        }
+        i ++;
+    }
 }
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev, LPSTR commandLine, int show)
