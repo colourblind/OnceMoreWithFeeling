@@ -7,7 +7,7 @@
 using namespace OnceMoreWithFeeling;
 using namespace std;
 
-const unsigned int NUM_BOIDS = 1000;
+const unsigned int NUM_BOIDS = 1024;
 const float NOTICE_DISTANCE = 0.75f;
 const float OPTIMAL_DISTANCE = 0.25f;
 const float MAX_SPEED = 0.001f;
@@ -74,9 +74,6 @@ struct Boid
 {
     Vector position;
     Vector velocity;
-    Vector acceleration;
-    shared_ptr<RenderObject> renderObject;
-    float anim;
 };
 
 class SwarmWorld : public World
@@ -87,8 +84,10 @@ public:
     virtual void Draw(shared_ptr<Renderer> renderer);
 
 private:
-    vector<shared_ptr<Boid>> boids_;
+    vector<Boid> boids_;
+    vector<float> anims_;
     float ermergerd_;
+    shared_ptr<RenderObject> bird_;
     shared_ptr<RenderObject> skybox_;
     GLuint skyboxTexture_;
     Vector swarmCentre_;
@@ -105,19 +104,19 @@ void SwarmWorld::Init(shared_ptr<Renderer> renderer)
     shared_ptr<Object> o = make_shared<Object>();
     o->AttachBuffer(0, boidVertexBuffer);
 
+    bird_ = make_shared<RenderObject>();
+    bird_->object = o;
+    bird_->program = "basic|basic";
+    bird_->colour[0] = bird_->colour[1] = bird_->colour[2] = 0.f;
+
     for (unsigned int i = 0; i < NUM_BOIDS; ++i)
     {
-        shared_ptr<Boid> b = make_shared<Boid>();
-        b->position = Vector(RandF(-4, 4), RandF(-4, 4), RandF(-4, 4));
-        b->velocity = Vector(RandF(-0.01f, 0.01f), RandF(-0.01f, 0.01f), RandF(-0.01f, 0.01f));
-        b->anim = RandF(0, 1);
-        
-        b->renderObject = make_shared<RenderObject>();
-        b->renderObject->object = o;
-        b->renderObject->program = "basic|basic";
-        b->renderObject->colour[0] = b->renderObject->colour[1] = b->renderObject->colour[2] = 0.f;
+        Boid b;
+        b.position = Vector(RandF(-4, 4), RandF(-4, 4), RandF(-4, 4));
+        b.velocity = Vector(RandF(-0.01f, 0.01f), RandF(-0.01f, 0.01f), RandF(-0.01f, 0.01f));
 
         boids_.push_back(b);
+        anims_.push_back(RandF(0, 1));
     }
 
     ermergerd_ = 0;
@@ -151,7 +150,7 @@ void SwarmWorld::Upate(float msecs)
 
     for (unsigned int i = 0; i < boids_.size(); ++i)
     {
-        shared_ptr<Boid> current = boids_[i];
+        Boid current = boids_[i];
 
         Vector cohesion;
         Vector seperation;
@@ -162,8 +161,8 @@ void SwarmWorld::Upate(float msecs)
             if (i == j)
                 continue;
 
-            shared_ptr<Boid> b = boids_[j];
-            Vector v = b->position - current->position;
+            Boid b = boids_[j];
+            Vector v = b.position - current.position;
             if (v.LengthSq() < NOTICE_DISTANCE * NOTICE_DISTANCE)
             {
                 // cohesion and seperation
@@ -172,7 +171,7 @@ void SwarmWorld::Upate(float msecs)
                 else
                     seperation = seperation - v;
                 // alignment
-                alignment = alignment + b->velocity;
+                alignment = alignment + b.velocity;
                 neighbourCount ++;
             }
         }
@@ -184,31 +183,32 @@ void SwarmWorld::Upate(float msecs)
         Vector cohesionPull = cohesion.Normalise() * 0.2f;
         Vector seperationPull = seperation.Normalise() * 1.5f;
         Vector alignmentPull = alignment.Normalise() * 0.5f;
-        Vector centerPull = (current->position * -1) * 0.1f;
+        Vector centerPull = (current.position * -1) * 0.1f;
 
         if (ermergerd_ > 0)
             cohesionPull = cohesion * -2;
 
         Vector pull = cohesionPull + seperationPull + alignmentPull + centerPull;
 
-        current->acceleration = pull * RESPONSIVENESS;
-        current->velocity = current->velocity + current->acceleration * msecs;
+        Vector acceleration = pull * RESPONSIVENESS;
+        current.velocity = current.velocity + acceleration * msecs;
 
-        if (current->velocity.LengthSq() > MAX_SPEED * MAX_SPEED)
-            current->velocity = current->velocity.Normalise() * MAX_SPEED;
-        current->position = current->position + current->velocity * msecs;
+        if (current.velocity.LengthSq() > MAX_SPEED * MAX_SPEED)
+            current.velocity = current.velocity.Normalise() * MAX_SPEED;
+        current.position = current.position + current.velocity * msecs;
+        
+        boids_[i].position = current.position;
+        boids_[i].velocity = current.velocity;
 
-        swarmCentre_ = swarmCentre_ + current->position * (1.f /  boids_.size());
+        swarmCentre_ = swarmCentre_ + current.position * (1.f /  boids_.size());
 
-        // Use our camera view transformation to align the 'mesh' to
-        // its velocity vector
-        Matrix align = Matrix::Camera(Vector(), current->velocity);
-        current->renderObject->transformation = Matrix::Translate(current->position) * align.Transpose() * Matrix::Scale(0.1f);
-
-        current->anim += WING_BEAT_SPEED * msecs;
-        if (current->anim > 1)
-            current->anim -= 1;
+        anims_[i] += WING_BEAT_SPEED * msecs;
+        if (anims_[i] > 1)
+            anims_[i] -= 1;
     }
+
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     ermergerd_ -= msecs;
 }
@@ -221,10 +221,15 @@ void SwarmWorld::Draw(shared_ptr<Renderer> renderer)
     renderer->Draw(skybox_);
 
     glDepthMask(GL_TRUE);
-    for (auto b : boids_)
+    for (int i = 0; i < NUM_BOIDS; ++i)
     {
-        b->renderObject->colour[2] = b->anim;
-        renderer->Draw(b->renderObject);
+        // Use our camera view transformation to align the 'mesh' to
+        // its velocity vector
+        Matrix align = Matrix::Camera(Vector(), boids_[i].velocity);
+        bird_->transformation = Matrix::Translate(boids_[i].position) * align.Transpose() * Matrix::Scale(0.1f);
+
+        bird_->colour[2] = anims_[i];
+        renderer->Draw(bird_);
     }
 }
 
