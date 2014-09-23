@@ -121,6 +121,11 @@ Window::~Window()
 
 int Window::Loop(shared_ptr<World> world, shared_ptr<Renderer> renderer)
 {
+    RECT rect;
+    ::GetClientRect(window_, &rect);
+    width_ = rect.right - rect.left;
+    height_ = rect.bottom - rect.top;
+
     renderer_ = renderer;
     renderer_->SetWindowSize(width_, height_);
 
