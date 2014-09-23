@@ -7,7 +7,7 @@
 using namespace OnceMoreWithFeeling;
 using namespace std;
 
-const unsigned int NUM_BOIDS = 1024;
+const unsigned int NUM_BOIDS = 2048;
 const float NOTICE_DISTANCE = 0.75f;
 const float OPTIMAL_DISTANCE = 0.25f;
 const float MAX_SPEED = 0.001f;
@@ -155,7 +155,6 @@ void SwarmWorld::Upate(float msecs)
         Vector cohesion;
         Vector seperation;
         Vector alignment;
-        int neighbourCount = 1;
         for (unsigned int j = 0; j < boids_.size(); ++j)
         {
             if (i == j)
@@ -172,13 +171,8 @@ void SwarmWorld::Upate(float msecs)
                     seperation = seperation - v;
                 // alignment
                 alignment = alignment + b.velocity;
-                neighbourCount ++;
             }
         }
-
-        cohesion = cohesion * (1.f / neighbourCount);
-        seperation = seperation * (1.f / neighbourCount);
-        alignment = alignment * (1.f / neighbourCount);
 
         Vector cohesionPull = cohesion.Normalise() * 0.2f;
         Vector seperationPull = seperation.Normalise() * 1.5f;
