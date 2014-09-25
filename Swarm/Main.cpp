@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <memory>
+#include <algorithm>
 #include "Window.h"
 #include "Renderer.h"
 #include "World.h"
@@ -7,7 +8,7 @@
 using namespace OnceMoreWithFeeling;
 using namespace std;
 
-const unsigned int NUM_BOIDS = 2048;
+const unsigned int NUM_BOIDS = 3072;
 const float NOTICE_DISTANCE = 0.75f;
 const float OPTIMAL_DISTANCE = 0.25f;
 const float MAX_SPEED = 0.001f;
@@ -72,9 +73,73 @@ float cubeVerts[] = {
 
 struct Boid
 {
+    unsigned int id;
     Vector position;
     Vector velocity;
 };
+
+class KdTreeNode
+{
+public:
+    KdTreeNode(vector<Boid> &boids, unsigned int depth);
+    void WithinRange(const Vector centre, float distance, vector<unsigned int> &result);
+    float DistanceSq(const Vector v) { return (value_.position - v).LengthSq(); }
+
+private:
+    Boid value_;
+    unique_ptr<KdTreeNode> left_;
+    unique_ptr<KdTreeNode> right_;
+};
+
+KdTreeNode::KdTreeNode(vector<Boid> &boids, unsigned int depth)
+    : left_(nullptr), right_(nullptr)
+{
+    unsigned int median = boids.size() / 2;
+    unsigned int axis = depth % 3;
+
+    if (axis == 0)
+        sort(boids.begin(), boids.end(), [](Boid a, Boid b){ return a.position.x < b.position.x; });
+    else if (axis == 1)
+        sort(boids.begin(), boids.end(), [](Boid a, Boid b){ return a.position.y < b.position.y; });
+    else
+        sort(boids.begin(), boids.end(), [](Boid a, Boid b){ return a.position.z < b.position.z; });
+
+    value_ = boids[median];
+
+    vector<Boid> leftPoints(boids.begin(), boids.begin() + median);
+    if (leftPoints.size() > 0)
+        left_ = make_unique<KdTreeNode>(leftPoints, depth + 1);
+
+    vector<Boid> rightPoints(boids.begin() + median + 1, boids.end());
+    if (rightPoints.size() > 0)
+        right_ = make_unique<KdTreeNode>(rightPoints, depth + 1);
+}
+
+void KdTreeNode::WithinRange(const Vector centre, float distance, vector<unsigned int> &result)
+{
+    float dsq = DistanceSq(centre);
+    if (dsq <= distance * distance)
+    {
+        result.push_back(value_.id);
+        if (left_)
+            left_->WithinRange(centre, distance, result);
+        if (right_)
+            right_->WithinRange(centre, distance, result);
+    }
+    else
+    {
+        float leftDistance = distance * 100;
+        float rightDistance = distance * 100;
+        if (left_)
+            leftDistance = left_->DistanceSq(centre);
+        if (right_)
+            rightDistance = right_->DistanceSq(centre);
+        if (leftDistance < rightDistance && left_)
+            left_->WithinRange(centre, distance, result);
+        else if (rightDistance < leftDistance && right_)
+            right_->WithinRange(centre, distance, result);
+    }
+}
 
 class SwarmWorld : public World
 {
@@ -112,6 +177,7 @@ void SwarmWorld::Init(shared_ptr<Renderer> renderer)
     for (unsigned int i = 0; i < NUM_BOIDS; ++i)
     {
         Boid b;
+        b.id = i;
         b.position = Vector(RandF(-4, 4), RandF(-4, 4), RandF(-4, 4));
         b.velocity = Vector(RandF(-0.01f, 0.01f), RandF(-0.01f, 0.01f), RandF(-0.01f, 0.01f));
 
@@ -148,30 +214,34 @@ void SwarmWorld::Upate(float msecs)
 
     swarmCentre_ = Vector();
 
+    //KdTreeNode kdTree(vector<Boid>(boids_.begin(), boids_.end()), 0);
+    KdTreeNode kdTree(vector<Boid>(boids_.begin(), boids_.end()), 0);
+
     for (unsigned int i = 0; i < boids_.size(); ++i)
     {
         Boid current = boids_[i];
 
+        vector<unsigned int> neighbourIds;
+        kdTree.WithinRange(boids_[i].position, NOTICE_DISTANCE, neighbourIds);
+
         Vector cohesion;
         Vector seperation;
         Vector alignment;
-        for (unsigned int j = 0; j < boids_.size(); ++j)
+        size_t woo = neighbourIds.size();
+        for (auto n : neighbourIds)
         {
-            if (i == j)
+            if (current.id == n)
                 continue;
 
-            Boid b = boids_[j];
+            Boid b = boids_[n];
             Vector v = b.position - current.position;
-            if (v.LengthSq() < NOTICE_DISTANCE * NOTICE_DISTANCE)
-            {
-                // cohesion and seperation
-                if (v.LengthSq() > OPTIMAL_DISTANCE * OPTIMAL_DISTANCE)
-                    cohesion = cohesion + v;
-                else
-                    seperation = seperation - v;
-                // alignment
-                alignment = alignment + b.velocity;
-            }
+            // cohesion and seperation
+            if (v.LengthSq() > OPTIMAL_DISTANCE * OPTIMAL_DISTANCE)
+                cohesion = cohesion + v;
+            else
+                seperation = seperation - v;
+            // alignment
+            alignment = alignment + b.velocity;
         }
 
         Vector cohesionPull = cohesion.Normalise() * 0.2f;
