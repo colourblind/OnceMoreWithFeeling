@@ -52,14 +52,22 @@ Window::Window(HINSTANCE instance, int show) : width_(640), height_(480)
         // Crash and burn
     }
 
+    RECT desiredSize;
+    desiredSize.top = 0;
+    desiredSize.left = 0;
+    desiredSize.bottom = height_;
+    desiredSize.right = width_;
+
+    ::AdjustWindowRectEx(&desiredSize, WS_OVERLAPPEDWINDOW, false, 0);
+
     window_ = ::CreateWindow(
         "OnceMoreWithFeeling",
         "OnceMoreWithFeeling",
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT,
         CW_USEDEFAULT, 
-        width_,
-        height_,
+        desiredSize.right - desiredSize.left,
+        desiredSize.bottom - desiredSize.top,
         nullptr,
         nullptr,
         instance,
