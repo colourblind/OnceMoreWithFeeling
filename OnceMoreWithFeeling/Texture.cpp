@@ -2,6 +2,8 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "Lib/stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "Lib/stb_image_write.h"
 
 using namespace OnceMoreWithFeeling;
 using namespace std;
@@ -69,4 +71,9 @@ GLuint OnceMoreWithFeeling::LoadCubeTexture(vector<string> filenames)
     }
 
     return handle;
+}
+
+void OnceMoreWithFeeling::SaveImage(string filename, unsigned int width, unsigned int height, vector<unsigned char> &data)
+{
+    int result = stbi_write_png(filename.c_str(), width, height, 4, &data[0], 0);
 }
