@@ -5,6 +5,11 @@
 #include <memory>
 #include <vector>
 
+// Uncomment this to render at 25fps and write every frame for a PNG file.
+// Also removes the FPS counter and is really slow.
+// TODO: move it into a new build configuration
+//#define OMWF_RECORDING
+
 #include "ShaderProgram.h"
 #include "Objects.h"
 #include "Fonts.h"
@@ -53,6 +58,7 @@ namespace OnceMoreWithFeeling
         unsigned int height_;
         Font font_;
         unsigned int frameCount_;
+        unsigned int totalFrameCount_;
         unsigned int fps_;
         Matrix projection_;
         Matrix view_;

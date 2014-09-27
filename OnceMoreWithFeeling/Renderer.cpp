@@ -2,6 +2,7 @@
 #include "Texture.h"
 
 #include <sstream>
+#include <iomanip>
 
 using namespace OnceMoreWithFeeling;
 using namespace std;
@@ -29,7 +30,7 @@ void main()\
     fragColour = vec4(colour, texture(font, texCoord).r);\
 }";
 
-Renderer::Renderer() : font_(), frameCount_(0), fps_(0), 
+Renderer::Renderer() : font_(), frameCount_(0), totalFrameCount_(0), fps_(0), 
     cameraPosition_(0, 0, 7), cameraLookAt_(0, 0, 0)
 {
     shared_ptr<ShaderProgram> textProgram = make_shared<ShaderProgram>();
@@ -64,53 +65,65 @@ void Renderer::StartFrame()
 
 void Renderer::EndFrame()
 {
-    vector<float> verts;
-    vector<float> texCoords;
+    #ifndef OMWF_RECORDING
+        vector<float> verts;
+        vector<float> texCoords;
 
-    stringstream ss;
-    ss << "fps: " << fps_;
-    font_.GetString(ss.str(), verts, texCoords);
+        stringstream ss;
+        ss << "fps: " << fps_;
+        font_.GetString(ss.str(), verts, texCoords);
 
-    shared_ptr<Buffer> textVerts, textTexCoords;
-    textVerts = make_shared<Buffer>();
-    textVerts->SetData(verts);
-    textTexCoords = make_shared<Buffer>();
-    textTexCoords->SetData(texCoords);
-    Object o;
-    o.AttachBuffer(0, textVerts, 2);
-    o.AttachBuffer(1, textTexCoords, 2);
+        shared_ptr<Buffer> textVerts, textTexCoords;
+        textVerts = make_shared<Buffer>();
+        textVerts->SetData(verts);
+        textTexCoords = make_shared<Buffer>();
+        textTexCoords->SetData(texCoords);
+        Object o;
+        o.AttachBuffer(0, textVerts, 2);
+        o.AttachBuffer(1, textTexCoords, 2);
 
-    shared_ptr<ShaderProgram> textProgram = shaders_["text|text"];
-    textProgram->Activate();
+        shared_ptr<ShaderProgram> textProgram = shaders_["text|text"];
+        textProgram->Activate();
 
-    GLint m = glGetUniformLocation(textProgram->Handle(), "m");
-    GLint v = glGetUniformLocation(textProgram->Handle(), "v");
-    GLint p = glGetUniformLocation(textProgram->Handle(), "p");
-    GLint t = glGetUniformLocation(textProgram->Handle(), "font");
-    float colour[] = { 1.f, 1.f, 1.f };
+        GLint m = glGetUniformLocation(textProgram->Handle(), "m");
+        GLint v = glGetUniformLocation(textProgram->Handle(), "v");
+        GLint p = glGetUniformLocation(textProgram->Handle(), "p");
+        GLint t = glGetUniformLocation(textProgram->Handle(), "font");
+        float colour[] = { 1.f, 1.f, 1.f };
 
-    Matrix identity;
-    glUniformMatrix4fv(m, 1, GL_FALSE, Matrix::Translate(0, 5, 0).gl());
-    glUniformMatrix4fv(v, 1, GL_FALSE, identity.gl());
-    glUniformMatrix4fv(p, 1, GL_FALSE, Matrix::Ortho(static_cast<float>(width_), static_cast<float>(height_)).gl());
-    glUniform1i(t, 0);
-    GLint c = glGetUniformLocation(textProgram->Handle(), "colour");
-    glUniform3fv(c, 1, colour);
+        Matrix identity;
+        glUniformMatrix4fv(m, 1, GL_FALSE, Matrix::Translate(0, 5, 0).gl());
+        glUniformMatrix4fv(v, 1, GL_FALSE, identity.gl());
+        glUniformMatrix4fv(p, 1, GL_FALSE, Matrix::Ortho(static_cast<float>(width_), static_cast<float>(height_)).gl());
+        glUniform1i(t, 0);
+        GLint c = glGetUniformLocation(textProgram->Handle(), "colour");
+        glUniform3fv(c, 1, colour);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, font_.GetTexture());
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, font_.GetTexture());
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_DEPTH_TEST);
 
-    o.Draw(GL_TRIANGLES);
+        o.Draw(GL_TRIANGLES);
 
-    glDisable(GL_BLEND);
+        glDisable(GL_BLEND);
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    #endif
+
+
+    #ifdef OMWF_RECORDING
+        vector<unsigned char> framePixels(width_ * height_ * 4);
+        glReadPixels(0, 0, width_, height_, GL_RGBA, GL_UNSIGNED_BYTE, &framePixels[0]);
+        ostringstream frameFilename;
+        frameFilename << "f" << setfill('0') << setw(6) << totalFrameCount_ << ".png";
+        SaveImage(frameFilename.str(), width_, height_, framePixels);
+    #endif
 
     frameCount_++;
+    totalFrameCount_ ++;
 }
 
 void Renderer::Draw(shared_ptr<RenderObject> renderObject, GLenum type)

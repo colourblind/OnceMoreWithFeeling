@@ -160,6 +160,10 @@ int Window::Loop(shared_ptr<World> world, shared_ptr<Renderer> renderer)
             ::QueryPerformanceCounter(&counter);
             float msecs = (counter.QuadPart - last.QuadPart) * toMsecs;
 
+            #ifdef OMWF_RECORDING
+            msecs = 1000.f / 25;
+            #endif
+
             last = counter;
             world->Upate(msecs);
 
