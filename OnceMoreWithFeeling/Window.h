@@ -15,7 +15,7 @@ namespace OnceMoreWithFeeling
     class Window
     {
     public:
-        Window(HINSTANCE instance, int showWindow);
+        Window(HINSTANCE instance, int showWindow, unsigned int width = 640, unsigned int height = 480);
         ~Window();
 
         int Loop(std::shared_ptr<World> world, std::shared_ptr<Renderer> renderer);

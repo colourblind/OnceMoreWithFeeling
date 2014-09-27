@@ -31,7 +31,8 @@ LRESULT CALLBACK Window::WndProc(HWND window, UINT message, WPARAM wParam, LPARA
     return 0;
 }
 
-Window::Window(HINSTANCE instance, int show) : width_(640), height_(480)
+Window::Window(HINSTANCE instance, int show, unsigned int width, unsigned int height) 
+    : width_(width), height_(height)
 {
     WNDCLASSEX windowClass;
     windowClass.cbClsExtra      = 0;
@@ -158,6 +159,7 @@ int Window::Loop(shared_ptr<World> world, shared_ptr<Renderer> renderer)
         {
             ::QueryPerformanceCounter(&counter);
             float msecs = (counter.QuadPart - last.QuadPart) * toMsecs;
+
             last = counter;
             world->Upate(msecs);
 
