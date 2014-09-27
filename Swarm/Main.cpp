@@ -14,6 +14,7 @@ const float OPTIMAL_DISTANCE = 0.25f;
 const float MAX_SPEED = 0.001f;
 const float RESPONSIVENESS = 0.000002f;
 const float WING_BEAT_SPEED = 0.003f;
+const float FREAKOUT_CHANCE_PER_SECOND = 0.1f;
 
 float boidVerts[] = {
     -0.2f, 0.0f, 0.4f,
@@ -209,12 +210,11 @@ void SwarmWorld::Init(shared_ptr<Renderer> renderer)
 void SwarmWorld::Upate(float msecs)
 {
     // Freak out time!
-    if (RandF(0, 1) > 0.998f)
+    if (RandF(0, 1) < (FREAKOUT_CHANCE_PER_SECOND / 1000) * msecs)
         ermergerd_ = 250;
 
     swarmCentre_ = Vector();
 
-    //KdTreeNode kdTree(vector<Boid>(boids_.begin(), boids_.end()), 0);
     KdTreeNode kdTree(vector<Boid>(boids_.begin(), boids_.end()), 0);
 
     for (unsigned int i = 0; i < boids_.size(); ++i)
@@ -250,7 +250,7 @@ void SwarmWorld::Upate(float msecs)
         Vector centerPull = (current.position * -1) * 0.1f;
 
         if (ermergerd_ > 0)
-            cohesionPull = cohesion * -2;
+            cohesionPull = cohesion * -4;
 
         Vector pull = cohesionPull + seperationPull + alignmentPull + centerPull;
 
