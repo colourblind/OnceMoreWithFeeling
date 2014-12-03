@@ -12,6 +12,7 @@ namespace OnceMoreWithFeeling
 
         Vector() : x(0), y(0), z(0), w(0) { }
         Vector(float ax, float ay, float az) : x(ax), y(ay), z(az), w(1) { }
+        Vector(const Vector &v) : x(v.x), y(v.y), z(v.z), w(v.w) { }
 
         Vector inline operator *(float scale)
         {
@@ -27,7 +28,7 @@ namespace OnceMoreWithFeeling
             return Vector(x + b.x, y + b.y, z + b.z);
         }
 
-        Vector inline operator -(Vector b)
+        Vector inline operator -(const Vector b)
         {
             return Vector(x - b.x, y - b.y, z - b.z);
         }
@@ -63,6 +64,13 @@ namespace OnceMoreWithFeeling
             return *this;
         }
 
+        Vector Normalised()
+        {
+            Vector v(*this);
+            v.Normalise();
+            return v;
+        }
+
         float Length()
         {
             return ::sqrtf(x * x + y * y + z * z);
@@ -71,6 +79,15 @@ namespace OnceMoreWithFeeling
         float LengthSq()
         {
             return x * x + y * y + z * z;
+        }
+
+        Vector Scale(Vector s)
+        {
+            return Vector(
+                x * s.x,
+                y * s.y,
+                z * s.z
+            );
         }
     };
 
@@ -483,6 +500,11 @@ namespace OnceMoreWithFeeling
             m.a[2][2] = z;
             m.a[3][3] = 1.0;
             return m;
+        }
+
+        static Matrix Scale(Vector v)
+        {
+            return Scale(v.x, v.y, v.z);
         }
 
         static Matrix Translate(float x, float y, float z)

@@ -66,53 +66,10 @@ void Renderer::StartFrame()
 void Renderer::EndFrame()
 {
     #ifndef OMWF_RECORDING
-        vector<float> verts;
-        vector<float> texCoords;
-
         stringstream ss;
         ss << "fps: " << fps_;
-        font_.GetString(ss.str(), verts, texCoords);
-
-        shared_ptr<Buffer> textVerts, textTexCoords;
-        textVerts = make_shared<Buffer>();
-        textVerts->SetData(verts);
-        textTexCoords = make_shared<Buffer>();
-        textTexCoords->SetData(texCoords);
-        Object o;
-        o.AttachBuffer(0, textVerts, 2);
-        o.AttachBuffer(1, textTexCoords, 2);
-
-        shared_ptr<ShaderProgram> textProgram = shaders_["text|text"];
-        textProgram->Activate();
-
-        GLint m = glGetUniformLocation(textProgram->Handle(), "m");
-        GLint v = glGetUniformLocation(textProgram->Handle(), "v");
-        GLint p = glGetUniformLocation(textProgram->Handle(), "p");
-        GLint t = glGetUniformLocation(textProgram->Handle(), "font");
-        float colour[] = { 1.f, 1.f, 1.f };
-
-        Matrix identity;
-        glUniformMatrix4fv(m, 1, GL_FALSE, Matrix::Translate(0, 5, 0).gl());
-        glUniformMatrix4fv(v, 1, GL_FALSE, identity.gl());
-        glUniformMatrix4fv(p, 1, GL_FALSE, Matrix::Ortho(static_cast<float>(width_), static_cast<float>(height_)).gl());
-        glUniform1i(t, 0);
-        GLint c = glGetUniformLocation(textProgram->Handle(), "colour");
-        glUniform3fv(c, 1, colour);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, font_.GetTexture());
-
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glDisable(GL_DEPTH_TEST);
-
-        o.Draw(GL_TRIANGLES);
-
-        glDisable(GL_BLEND);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
+        DrawText(ss.str(), Vector(0, 5, 0));
     #endif
-
 
     #ifdef OMWF_RECORDING
         vector<unsigned char> framePixels(width_ * height_ * 4);
@@ -145,6 +102,51 @@ void Renderer::Draw(shared_ptr<RenderObject> renderObject, GLenum type)
         SetTextures(renderObject->program, renderObject->textureBindings);
 
     renderObject->object->Draw(type);
+}
+
+void Renderer::DrawText(string text, Vector position, float size, Vector colour)
+{
+    vector<float> verts;
+    vector<float> texCoords;
+    font_.GetString(text, verts, texCoords);
+
+    shared_ptr<Buffer> textVerts, textTexCoords;
+    textVerts = make_shared<Buffer>();
+    textVerts->SetData(verts);
+    textTexCoords = make_shared<Buffer>();
+    textTexCoords->SetData(texCoords);
+    Object o;
+    o.AttachBuffer(0, textVerts, 2);
+    o.AttachBuffer(1, textTexCoords, 2);
+
+    shared_ptr<ShaderProgram> textProgram = shaders_["text|text"];
+    textProgram->Activate();
+
+    GLint m = glGetUniformLocation(textProgram->Handle(), "m");
+    GLint v = glGetUniformLocation(textProgram->Handle(), "v");
+    GLint p = glGetUniformLocation(textProgram->Handle(), "p");
+    GLint t = glGetUniformLocation(textProgram->Handle(), "font");
+    float c[] = { colour.x, colour.y, colour.z };
+
+    Matrix identity;
+    glUniformMatrix4fv(m, 1, GL_FALSE, (Matrix::Translate(position) * Matrix::Scale(size)).gl());
+    glUniformMatrix4fv(v, 1, GL_FALSE, identity.gl());
+    glUniformMatrix4fv(p, 1, GL_FALSE, Matrix::Ortho(static_cast<float>(width_), static_cast<float>(height_)).gl());
+    glUniform1i(t, 0);
+    glUniform3fv(glGetUniformLocation(textProgram->Handle(), "colour"), 1, c);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, font_.GetTexture());
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_DEPTH_TEST);
+
+    o.Draw(GL_TRIANGLES);
+
+    glDisable(GL_BLEND);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Renderer::AddShader(string vertexShaderName, string fragmentShaderName)

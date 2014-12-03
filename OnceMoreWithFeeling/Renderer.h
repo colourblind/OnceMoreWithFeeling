@@ -15,6 +15,9 @@
 #include "Fonts.h"
 #include "Maths.h"
 
+// Fuck you, Win32
+#undef DrawText
+
 namespace OnceMoreWithFeeling
 {
     struct RenderObject
@@ -35,6 +38,7 @@ namespace OnceMoreWithFeeling
         void StartFrame();
         void EndFrame();
         void Draw(std::shared_ptr<RenderObject> renderObject, GLenum type = GL_TRIANGLES);
+        void DrawText(std::string text, Vector position, float size = 1, Vector colour = Vector(1, 1, 1));
 
         void SetCameraPosition(Vector cameraPosition) { cameraPosition_ = cameraPosition; }
         void SetCameraLookAt(Vector cameraLookAt) { cameraLookAt_ = cameraLookAt; }
@@ -50,6 +54,9 @@ namespace OnceMoreWithFeeling
         void SetUniform(std::string program, int location, Vector value);
 
         void SetTextures(std::string program, std::unordered_map<unsigned int, std::string> binding);
+
+        unsigned int Width() const { return width_; }
+        unsigned int Height() const { return height_; }
 
     protected:
         std::unordered_map<std::string, std::shared_ptr<ShaderProgram>> shaders_;
