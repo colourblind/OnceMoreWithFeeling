@@ -8,6 +8,7 @@
 
 #include "World.h"
 #include "Renderer.h"
+#include "Input.h"
 
 namespace OnceMoreWithFeeling
 {
@@ -24,6 +25,7 @@ namespace OnceMoreWithFeeling
     protected:
         std::shared_ptr<World> world_;
         static std::shared_ptr<Renderer> renderer_;
+        static Input input_;
         HWND window_;
         HDC deviceContext_;
         HGLRC renderContext_;

@@ -6,6 +6,7 @@ using namespace OnceMoreWithFeeling;
 using namespace std;
 
 shared_ptr<Renderer> Window::renderer_ = nullptr;
+Input Window::input_;
 
 LRESULT CALLBACK Window::WndProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -20,6 +21,13 @@ LRESULT CALLBACK Window::WndProc(HWND window, UINT message, WPARAM wParam, LPARA
             break;
         case WM_SIZE:
             renderer_->SetWindowSize(LOWORD(lParam), HIWORD(lParam));
+            break;
+        case WM_KEYDOWN:
+            if (!(lParam & 0x40000000)) // repeats
+                input_.SetDown(wParam);
+            break;
+        case WM_KEYUP:
+            input_.SetUp(wParam);
             break;
         case WM_DESTROY:
             ::PostQuitMessage(0);
@@ -144,6 +152,8 @@ int Window::Loop(shared_ptr<World> world, shared_ptr<Renderer> renderer)
     float toMsecs = 1000.f / freq.QuadPart;
     float msecCounter = 0;
 
+    input_.Init();
+
     // Main message loop:
     MSG msg;
     while (true)
@@ -179,6 +189,7 @@ int Window::Loop(shared_ptr<World> world, shared_ptr<Renderer> renderer)
                 renderer_->ResetFrameCount();
                 msecCounter -= 1000;
             }
+            input_.ResetTick();
         }
     }
 

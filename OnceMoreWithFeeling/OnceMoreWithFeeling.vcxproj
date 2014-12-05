@@ -105,6 +105,7 @@
   <ItemGroup>
     <ClInclude Include="FontData.h" />
     <ClInclude Include="Fonts.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="Objects.h" />
     <ClInclude Include="Renderer.h" />
@@ -116,6 +117,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fonts.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="Objects.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
