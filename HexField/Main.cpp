@@ -139,7 +139,18 @@ void HexFieldWorld::Upate(float msecs)
             }
 
             if (r >= 0)
-                hexes_[i]->transformation = Matrix::Scale(0.1f) * Matrix::Translate(Vector(x * (3.f + PADDING * 2) + offset, y * (0.866f + PADDING), 0)) * Matrix::Translate(Vector((-COUNT_X / 2) * (3.f + PADDING * 2), (-COUNT_Y / 2) * (0.866f + PADDING), 0)) * Matrix::Rotate(0, r - PI / 2, 0);
+            {
+                Vector pos = Matrix::Scale(0.1f) *
+                    Matrix::Translate(Vector(x * (3.f + PADDING * 2) + offset, y * (0.866f + PADDING), 0)) *
+                    Matrix::Translate(Vector((-COUNT_X / 2) * (3.f + PADDING * 2), (-COUNT_Y / 2) * (0.866f + PADDING), 0)) *
+                    Vector(0, 0, 0);
+
+                hexes_[i]->transformation = Matrix::Scale(0.1f) *
+                    Matrix::Translate(Vector(x * (3.f + PADDING * 2) + offset, y * (0.866f + PADDING), 0)) *
+                    Matrix::Translate(Vector((-COUNT_X / 2) * (3.f + PADDING * 2), (-COUNT_Y / 2) * (0.866f + PADDING), 0)) *
+                    Matrix::Billboard(Vector(0, 0, 7), pos) *
+                    Matrix::Rotate(0, r - PI / 2, 0);
+            }
             rotations_[i] = r;
         }
     }
@@ -168,6 +179,15 @@ void HexFieldWorld::Draw(shared_ptr<Renderer> renderer)
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    Input input;
+    if (input.GetState(0x4C)) // L key
+        return; 
+    if (input.PushedThisTick(0x4B)) // K
+    {
+        for (auto hex : hexes_)
+            hex->colour[2] = 1 - hex->colour[2];
+    }
 
     int i = 0;
     for (auto hex : hexes_)
