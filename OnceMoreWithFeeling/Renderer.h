@@ -14,6 +14,7 @@
 #include "Objects.h"
 #include "Fonts.h"
 #include "Maths.h"
+#include "Framebuffer.h"
 
 // Fuck you, Win32
 #undef DrawText
@@ -45,6 +46,7 @@ namespace OnceMoreWithFeeling
 
         void AddShader(std::string vertexShaderName, std::string fragmentShaderName);
         void AddTexture(std::string textureName);
+        void AddTexture(std::string textureName, GLuint handle);
         void AddCubeTexture(std::string textureName, std::vector<std::string> filenames);
         void SetWindowSize(unsigned int width, unsigned int height);
         void ResetFrameCount() { fps_ = frameCount_; frameCount_ = 0; }
@@ -55,8 +57,8 @@ namespace OnceMoreWithFeeling
 
         void SetTextures(std::string program, std::unordered_map<unsigned int, std::string> binding);
 
-        unsigned int Width() const { return width_; }
-        unsigned int Height() const { return height_; }
+        void SetFramebuffer(std::shared_ptr<Framebuffer> framebuffer);
+        void ResetFramebuffer();
 
     protected:
         std::unordered_map<std::string, std::shared_ptr<ShaderProgram>> shaders_;

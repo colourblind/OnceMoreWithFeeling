@@ -12,7 +12,6 @@
 
 namespace OnceMoreWithFeeling
 {
-
     class Window
     {
     public:

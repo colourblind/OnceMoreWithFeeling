@@ -198,6 +198,7 @@
   <ItemGroup>
     <ClInclude Include="FontData.h" />
     <ClInclude Include="Fonts.h" />
+    <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="Objects.h" />
@@ -210,6 +211,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fonts.cpp" />
+    <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Objects.cpp" />
     <ClCompile Include="Renderer.cpp" />

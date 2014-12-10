@@ -54,13 +54,7 @@ void Renderer::StartFrame()
     glCullFace(GL_BACK);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    float aspectRatio = static_cast<float>(height_) / width_;
-    float nearClip = 0.1f;
-    float farClip = 50;
-    float fov = PI / 3;
-
     view_ = Matrix::Camera(cameraPosition_, cameraLookAt_);
-    projection_ = Matrix::Projection(nearClip, farClip, aspectRatio, fov);
 }
 
 void Renderer::EndFrame()
@@ -164,6 +158,11 @@ void Renderer::AddTexture(string textureName)
     textures_.insert(make_pair(textureName, make_pair(GL_TEXTURE_2D, handle)));
 }
 
+void Renderer::AddTexture(string textureName, GLuint handle)
+{
+    textures_.insert(make_pair(textureName, make_pair(GL_TEXTURE_2D, handle)));
+}
+
 void Renderer::AddCubeTexture(string textureName, vector<string> filenames)
 {
     GLuint handle = LoadCubeTexture(filenames);
@@ -174,6 +173,7 @@ void Renderer::SetWindowSize(unsigned int width, unsigned int height)
 {
     width_ = width;
     height_ = height;
+    projection_ = Matrix::Projection(0.1f, 50, static_cast<float>(height_) / width_, PI / 3);
 }
 
 void Renderer::SetUniform(string program, int location, int value)
@@ -202,4 +202,20 @@ void Renderer::SetTextures(string program, unordered_map<unsigned int, string> b
         glProgramUniform1i(shader->Handle(), binding.first, i);
         i++;
     }
+}
+
+void Renderer::SetFramebuffer(shared_ptr<Framebuffer> framebuffer)
+{
+    framebuffer->Activate();
+    unsigned int width = framebuffer->Width();
+    unsigned int height = framebuffer->Height();
+    glViewport(0, 0, width, height);
+    projection_ = Matrix::Projection(0.1f, 50, static_cast<float>(height) / width, PI / 3);
+}
+
+void Renderer::ResetFramebuffer()
+{
+    Framebuffer::Deactivate();
+    glViewport(0, 0, width_, height_);
+    projection_ = Matrix::Projection(0.1f, 50, static_cast<float>(height_) / width_, PI / 3);
 }
