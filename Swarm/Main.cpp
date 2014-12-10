@@ -301,7 +301,11 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev, LPSTR commandLine, int sh
 {
     srand(::GetTickCount());
 
-    OnceMoreWithFeeling::Window w(instance, show);
+    #ifdef OMWF_RECORDING
+        OnceMoreWithFeeling::Window w(instance, show, 1280, 720);
+    #else
+        OnceMoreWithFeeling::Window w(instance, show);
+    #endif
     shared_ptr<Renderer> renderer = make_shared<Renderer>();
     shared_ptr<World> world = make_shared<SwarmWorld>();
 
