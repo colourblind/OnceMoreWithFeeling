@@ -39,32 +39,36 @@ void DataCubeWorld::LoadData(wstring filename, int dimensions, vector<float> &re
     streampos length = f.tellg();
     f.seekg(0, ios::beg);
 
-    unsigned char *buffer = new unsigned char[dimensions];
-
     result = vector<float>(static_cast<int>(powf(256, static_cast<float>(dimensions))));
 
     float s = 1.f / length;
     *maxValue = 0;
     *minValue = 1;
     *activePoints = 0;
+
+    vector<unsigned char> buffer(dimensions);
+    f.read(reinterpret_cast<char *>(&(buffer[0])), dimensions);
+    unsigned int bufferIndex = 0;
+
     while (!f.eof())
     {
-        f.read(reinterpret_cast<char *>(buffer), dimensions);
         unsigned int index = 0;
-        for (int i = 0; i < dimensions; ++i)
+        for (int i = 0, j = bufferIndex; i < dimensions; ++i, j = (j + 1) % dimensions)
         {
-            unsigned char c = buffer[i];
+            unsigned char c = buffer[j];
             index += static_cast<unsigned int>(c * powf(256, static_cast<float>(dimensions - 1 - i)));
         }
+
         if (result[index] < s)
             (*activePoints)++;
         result[index] += s;
         *maxValue = max(*maxValue, result[index]);
         *minValue = min(*minValue, result[index]);
+
+        f.read(reinterpret_cast<char *>(&(buffer[bufferIndex])), 1);
+        bufferIndex = (bufferIndex + 1) % dimensions;
     }
     f.close();
-
-    delete[] buffer;
 }
 
 void DataCubeWorld::CreateCube(shared_ptr<Buffer> vertexBuffer, shared_ptr<Buffer> colourBuffer)
@@ -151,15 +155,15 @@ void DataCubeWorld::CreateCube(shared_ptr<Buffer> vertexBuffer, shared_ptr<Buffe
 
 Vector DataCubeWorld::GetColour(float f, float scale)
 {
-    Vector c[] = {
-        Vector(0, 0, 1),
-        Vector(1, 0, 1),
-        Vector(1, 0, 0),
+    vector<Vector> c = {
+        Vector(0, 0, 0.5f),
+        Vector(0.75f, 0, 0.75f),
+        Vector(0.8f, 0, 0),
         Vector(1, 1, 0),
         Vector(1, 1, 1)
     };
     f = pow(f, scale);
-    f *= 4;
+    f *= (c.size() - 1);
     
     Vector c0 = c[static_cast<int>(floor(f))];
     Vector c1 = c[static_cast<int>(ceil(f))];
