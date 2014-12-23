@@ -28,6 +28,7 @@ private:
     float rotation_;
     RenderMode renderMode_;
     wstring targetFile_;
+    bool animating_;
 };
 
 void DataCubeWorld::LoadData(wstring filename, int dimensions, vector<float> &result, unsigned long *activePoints, float *minValue, float *maxValue)
@@ -39,7 +40,7 @@ void DataCubeWorld::LoadData(wstring filename, int dimensions, vector<float> &re
     streampos length = f.tellg();
     f.seekg(0, ios::beg);
 
-    result = vector<float>(static_cast<int>(powf(256, static_cast<float>(dimensions))));
+    result = vector<float>(static_cast<int>(pow(256, static_cast<int>(dimensions))));
 
     float s = 1.f / length;
     *maxValue = 0;
@@ -56,7 +57,7 @@ void DataCubeWorld::LoadData(wstring filename, int dimensions, vector<float> &re
         for (int i = 0, j = bufferIndex; i < dimensions; ++i, j = (j + 1) % dimensions)
         {
             unsigned char c = buffer[j];
-            index += static_cast<unsigned int>(c * powf(256, static_cast<float>(dimensions - 1 - i)));
+            index += static_cast<unsigned int>(c * pow(256, static_cast<int>(dimensions - 1 - i)));
         }
 
         if (result[index] < s)
@@ -213,13 +214,21 @@ void DataCubeWorld::Init(shared_ptr<Renderer> renderer)
     object_->program = "basic|basic";
 
     rotation_ = 0;
+    animating_ = true;
 }
 
 void DataCubeWorld::Upate(float msecs)
 {
-    rotation_ += 0.001f * msecs;
-    if (rotation_ > PI * 2)
-        rotation_ -= PI * 2;
+    Input input;
+    if (input.PushedThisTick(VK_SPACE))
+        animating_ = !animating_;
+
+    if (animating_)
+    {
+        rotation_ += 0.001f * msecs;
+        if (rotation_ > PI * 2)
+            rotation_ -= PI * 2;
+    }
 
     if (renderMode_ == RenderMode::CUBE)
         object_->transformation = Matrix::Scale(4.5f / 256) * Matrix::Rotate(0, rotation_, 0) * Matrix::Translate(-128, -128, -128);
