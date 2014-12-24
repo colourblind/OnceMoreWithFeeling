@@ -43,33 +43,44 @@ void DataCubeWorld::LoadData(wstring filename, int dimensions, vector<float> &re
     result = vector<float>(static_cast<int>(pow(256, static_cast<int>(dimensions))));
 
     float s = 1.f / length;
-    *maxValue = 0;
-    *minValue = 1;
     *activePoints = 0;
 
-    vector<unsigned char> buffer(dimensions);
-    f.read(reinterpret_cast<char *>(&(buffer[0])), dimensions);
-    unsigned int bufferIndex = 0;
+    vector<unsigned char> buffer(dimensions * 1024);
+    size_t bufferSize = buffer.size();
+    unsigned int bufferIndex = bufferSize;
 
     while (!f.eof())
     {
-        unsigned int index = 0;
-        for (int i = 0, j = bufferIndex; i < dimensions; ++i, j = (j + 1) % dimensions)
+        if (bufferIndex >= bufferSize)
         {
-            unsigned char c = buffer[j];
+            f.read(reinterpret_cast<char *>(&(buffer[0])), bufferSize);
+            bufferIndex = 0;
+        }
+
+        unsigned int index = 0;
+        for (int i = 0; i < dimensions; ++i)
+        {
+            unsigned char c = buffer[bufferIndex + i];
             index += static_cast<unsigned int>(c * pow(256, static_cast<int>(dimensions - 1 - i)));
         }
+        bufferIndex += dimensions;
 
         if (result[index] < s)
             (*activePoints)++;
         result[index] += s;
-        *maxValue = max(*maxValue, result[index]);
-        *minValue = min(*minValue, result[index]);
-
-        f.read(reinterpret_cast<char *>(&(buffer[bufferIndex])), 1);
-        bufferIndex = (bufferIndex + 1) % dimensions;
     }
     f.close();
+
+    *maxValue = 0;
+    *minValue = 1;
+    for (auto v : result)
+    {
+        if (v > 0)
+        {
+            *maxValue = max(*maxValue, v);
+            *minValue = min(*minValue, v);
+        }
+    }
 }
 
 void DataCubeWorld::CreateCube(shared_ptr<Buffer> vertexBuffer, shared_ptr<Buffer> colourBuffer)
