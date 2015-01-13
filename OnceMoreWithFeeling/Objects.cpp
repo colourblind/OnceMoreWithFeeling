@@ -55,3 +55,15 @@ void Buffer::SetData(vector<float> &data)
 {
     SetData(&data[0], data.size());
 }
+
+void Buffer::SetData(vector<Vector> &data)
+{
+    vector<float> actualData(data.size() * 3);
+    for (unsigned int i = 0; i < data.size(); ++i)
+    {
+        actualData[i * 3 + 0] = data[i].x;
+        actualData[i * 3 + 1] = data[i].y;
+        actualData[i * 3 + 2] = data[i].z;
+    }
+    SetData(&actualData[0], actualData.size());
+}

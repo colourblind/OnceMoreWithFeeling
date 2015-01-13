@@ -33,7 +33,7 @@ float SmoothNoise(float x, float y)
 }
 
 // Fractal Brownian Motion
-void OnceMoreWithFeeling::CreateNoise(vector<float> &data, int octaves, int width, int height)
+void OnceMoreWithFeeling::CreateNoise(vector<float> &data, int octaves, int width, int height, float frequencyScale)
 {
     data.resize(width * height, 0);
     
@@ -41,7 +41,7 @@ void OnceMoreWithFeeling::CreateNoise(vector<float> &data, int octaves, int widt
     {
         for (int x = 0; x < width; ++x)
         {
-            float frequency = 1.f / max(width, height);
+            float frequency = frequencyScale / max(width, height);
             float amplitude = 0.5f;
             float result = 0;
             for (int o = 0; o < octaves; ++o)

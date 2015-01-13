@@ -5,6 +5,7 @@
 #include "Lib/glew.h"
 
 #include "ShaderProgram.h"
+#include "Maths.h"
 
 namespace OnceMoreWithFeeling
 {
@@ -16,6 +17,7 @@ namespace OnceMoreWithFeeling
 
         void SetData(float *data, unsigned int count);
         void SetData(std::vector<float> &data);
+        void SetData(std::vector<Vector> &data);
         unsigned int GetSize() { return count_; }
 
         void Activate() { glBindBuffer(GL_ARRAY_BUFFER, bufferObject_); }

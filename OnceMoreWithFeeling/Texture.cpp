@@ -33,7 +33,11 @@ GLuint OnceMoreWithFeeling::LoadTexture(string filename)
         break;
     }
 
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glTexStorage2D(GL_TEXTURE_2D, 4, internalFormat, width, height);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, format, GL_UNSIGNED_BYTE, data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
     stbi_image_free(data);
 
     return handle;

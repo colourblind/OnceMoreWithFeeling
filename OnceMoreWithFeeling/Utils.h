@@ -5,7 +5,7 @@
 
 namespace OnceMoreWithFeeling
 {
-    void CreateNoise(std::vector<float> &data, int octaves, int width, int height);
+    void CreateNoise(std::vector<float> &data, int octaves, int width, int height, float frequencyScale = 1.f);
     float Lerp(float a, float b, float t);
     float Coserp(float a, float b, float t);
 
