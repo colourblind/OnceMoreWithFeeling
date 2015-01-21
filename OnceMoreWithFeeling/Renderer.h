@@ -40,6 +40,7 @@ namespace OnceMoreWithFeeling
         void EndFrame();
         void Draw(std::shared_ptr<RenderObject> renderObject, GLenum type = GL_TRIANGLES);
         void DrawText(std::string text, Vector position, float size = 1, Vector colour = Vector(1, 1, 1));
+        void DrawText3d(std::string text, Vector position, float size = 1, Vector colour = Vector(1, 1, 1));
 
         void SetCameraPosition(Vector cameraPosition) { cameraPosition_ = cameraPosition; }
         void SetCameraLookAt(Vector cameraLookAt) { cameraLookAt_ = cameraLookAt; }
