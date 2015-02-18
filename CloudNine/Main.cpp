@@ -108,8 +108,6 @@ void CloudNineWorld::Init(shared_ptr<Renderer> renderer)
     renderer->SetCameraLookAt(Vector(0, 0, -1));
 }
 
-Vector cameraPos(0, 0, 20);
-
 void CloudNineWorld::Upate(float msecs)
 {
     if (flashTime_ < 0 && RandF(0, 1) > 0.98f)
@@ -124,14 +122,33 @@ void CloudNineWorld::Upate(float msecs)
     if (lightRotation_ > PI * 2)
         lightRotation_ -= PI * 2;
 
-    cameraPos.z -= 0.0015f * msecs;
+    unsigned int refreshCount = 0;
+    for (unsigned int i = 0; i < fluffs_.size() - refreshCount; ++i)
+    {
+        auto fluff = fluffs_[i];
+        auto fluffNormal = fluffNormals_[i];
+        fluff->transformation.a[3][2] += 0.0015f * msecs;
+        //continue;
+        if (fluff->transformation.a[3][2] > 20)
+        {
+            fluff->colour[1] = 0;
+            fluff->colour[2] = 0;
+            fluff->transformation.a[3][2] -= 50;
+            // remove from fluff and normals
+            fluffs_.erase(fluffs_.begin() + i);
+            fluffNormals_.erase(fluffNormals_.begin() + i);
+            // push onto the back
+            fluffs_.push_back(fluff);
+            fluffNormals_.push_back(fluffNormal);
+            // fudge our iterator
+            i = i - 1;
+            refreshCount ++;
+        }
+    }
 }
 
 void CloudNineWorld::Draw(shared_ptr<Renderer> renderer)
 {
-    renderer->SetCameraPosition(cameraPos);
-    renderer->SetCameraLookAt(cameraPos + Vector(0, 0, -1));
-
     glDisable(GL_CULL_FACE);
 
     renderer->SetUniform("fluff|fluff", 0, Vector(sinf(lightRotation_), -2, cosf(lightRotation_))); // lightDir
@@ -142,12 +159,10 @@ void CloudNineWorld::Draw(shared_ptr<Renderer> renderer)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    int fluffIndex = 0;
-    for (auto fluff : fluffs_)
+    for (int fluffIndex = fluffs_.size() - 1; fluffIndex >= 0; --fluffIndex)
     {
         renderer->SetUniform("fluff|fluff", 3, fluffNormals_[fluffIndex]);
-        renderer->Draw(fluff);
-        fluffIndex ++;
+        renderer->Draw(fluffs_[fluffIndex]);
     }
 }
 
