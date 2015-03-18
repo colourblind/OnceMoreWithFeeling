@@ -529,7 +529,11 @@ namespace OnceMoreWithFeeling
 
         static Matrix Camera(Vector eye, Vector target)
         {
-            Vector up = Vector(0, 1, 0);
+            return Camera(eye, target, Vector(0, 1, 0));
+        }
+
+        static Matrix Camera(Vector eye, Vector target, Vector up)
+        {
             Vector zaxis = (target - eye).Normalise();
             Vector xaxis = Vector::Cross(zaxis, up).Normalise();
             Vector yaxis = Vector::Cross(xaxis, zaxis).Normalise();
@@ -609,6 +613,116 @@ namespace OnceMoreWithFeeling
         }
 
         float a[4][4];		// Columns, Rows
+    };
+
+    struct Quaternion
+    {
+        float w, x, y, z;
+
+        Quaternion() : w(1), x(0), y(0), z(0)
+        {
+
+        }
+
+        Quaternion(const Vector &b) : x(b.x), y(b.y), z(b.z), w(0.0)
+        {
+        
+        }
+
+        Quaternion(const Vector &axis, const float angle)
+        {
+            float a = angle / 2;
+            w = cos(a);
+            x = sin(a) * axis.x;
+            y = sin(a) * axis.y;
+            z = sin(a) * axis.z;
+        }
+
+        void Normalise()
+        {
+            float n = sqrt(x * x + y * y + z * z + w * w);
+            x /= n;
+            y /= n;
+            z /= n;
+            w /= n;
+        }
+
+        Quaternion Inverse() const
+        {
+            Quaternion r;
+            float n = x * x + y * y + z * z + w * w;
+            r.x = x / -n;
+            r.y = y / -n;
+            r.z = z / -n;
+            r.w = w / n;
+            return r;
+        }
+
+        Quaternion operator *(const Quaternion &b) const
+        {
+            float rw = w * b.w - x * b.x - y * b.y - z * b.z;
+            float rx = w * b.x + x * b.w + y * b.z - z * b.y;
+            float ry = w * b.y - x * b.z + y * b.w + z * b.x;
+            float rz = w * b.z + x * b.y - y * b.x + z * b.w;
+
+            Quaternion q;
+            q.x = rx;
+            q.y = ry;
+            q.z = rz;
+            q.w = rw;
+
+            return q;
+        }
+
+        Vector operator *(const Vector &b) const
+        {
+            Quaternion a(b);
+            Quaternion r = *this * a;
+            Quaternion i = Quaternion(*this).Inverse();
+            r = r * i;
+            return Vector(r.x, r.y, r.z);
+        }
+
+        static Quaternion FromEuler(const float pitch, const float yaw, const float roll)
+        {
+            Quaternion q;
+
+            float cx = cos(pitch / 2);
+            float cy = cos(yaw / 2);
+            float cz = cos(roll / 2);
+
+            float sx = sin(pitch / 2);
+            float sy = sin(yaw / 2);
+            float sz = sin(roll / 2);
+
+            q.w = cx * cy * cz + sx * sy * sz;
+            q.x = sx * cy * cz - cx * sy * sz;
+            q.y = cx * sy * cz + sx * cy * sz;
+            q.z = cx * cy * sz - sx * sy * cz;
+            
+            q.Normalise();
+
+            return q;
+        }
+
+        Matrix ToMatrix() const
+        {
+            Matrix m;
+
+            m.a[0][0] = w * w + x * x - y * y - z * z;
+            m.a[0][1] = 2 * x * y + 2 * z * w;
+            m.a[0][2] = 2 * x * z - 2 * y * w;
+
+            m.a[1][0] = 2 * x * y - 2 * z * w;
+            m.a[1][1] = w * w - x * x + y * y - z * z;
+            m.a[1][2] = 2 * y * z + 2 * x * w;
+
+            m.a[2][0] = 2 * x * z + 2 * y * w;
+            m.a[2][1] = 2 * y * z - 2 * x * w;
+            m.a[2][2] = w * w - x * x - y * y + z * z;
+
+            return m;
+        }
     };
 
     static float RandF(float min, float max)

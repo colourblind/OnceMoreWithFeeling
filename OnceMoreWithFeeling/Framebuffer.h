@@ -14,6 +14,7 @@ namespace OnceMoreWithFeeling
         static void Deactivate();
 
         GLuint GetTexture() const { return texture_; }
+        GLuint GetDepth() const { return depth_; }
         unsigned int Width() const { return width_; }
         unsigned int Height() const { return height_; }
 

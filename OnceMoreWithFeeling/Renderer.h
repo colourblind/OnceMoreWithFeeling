@@ -39,11 +39,13 @@ namespace OnceMoreWithFeeling
         void StartFrame();
         void EndFrame();
         void Draw(std::shared_ptr<RenderObject> renderObject, GLenum type = GL_TRIANGLES);
+        void DrawFullscreenQuad(std::string programName, std::unordered_map<unsigned int, std::string> textures);
         void DrawText(std::string text, Vector position, float size = 1, Vector colour = Vector(1, 1, 1));
         void DrawText3d(std::string text, Vector position, float size = 1, Vector colour = Vector(1, 1, 1));
 
         void SetCameraPosition(Vector cameraPosition) { cameraPosition_ = cameraPosition; }
         void SetCameraLookAt(Vector cameraLookAt) { cameraLookAt_ = cameraLookAt; }
+        void SetCameraUp(Vector cameraUp) { cameraUp_ = cameraUp; }
 
         void AddShader(std::string vertexShaderName, std::string fragmentShaderName);
         void AddTexture(std::string textureName);
@@ -74,5 +76,7 @@ namespace OnceMoreWithFeeling
         Matrix view_;
         Vector cameraPosition_;
         Vector cameraLookAt_;
+        Vector cameraUp_;
+        Object quad_;
     };
 }

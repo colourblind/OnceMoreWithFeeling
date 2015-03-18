@@ -30,12 +30,38 @@ void main()\
     fragColour = vec4(colour, texture(font, texCoord).r);\
 }";
 
+vector<float> quadVerts = {
+    0, 0, 0,
+    0, 1, 0,
+    1, 1, 0,
+    1, 1, 0,
+    1, 0, 0,
+    0, 0, 0
+};
+
+vector<float> quadTexcoords = {
+    0, 0,
+    0, 1,
+    1, 1,
+    1, 1,
+    1, 0,
+    0, 0
+};
+
 Renderer::Renderer() : font_(), frameCount_(0), totalFrameCount_(0), fps_(0), 
-    cameraPosition_(0, 0, 7), cameraLookAt_(0, 0, 0)
+    cameraPosition_(0, 0, 7), cameraLookAt_(0, 0, 0), cameraUp_(0, 1, 0)
 {
     shared_ptr<ShaderProgram> textProgram = make_shared<ShaderProgram>();
     textProgram->Build(TEXT_VERTEX_SOURCE, TEXT_FRAGMENT_SOURCE);
     shaders_.insert(make_pair("text|text", textProgram));
+    
+    shared_ptr<Buffer> vertices = make_shared<Buffer>();
+    shared_ptr<Buffer> texCoords = make_shared<Buffer>();
+    vertices->SetData(quadVerts);
+    texCoords->SetData(quadTexcoords);
+
+    quad_.AttachBuffer(0, vertices);
+    quad_.AttachBuffer(1, texCoords, 2);
 }
 
 Renderer::~Renderer()
@@ -54,7 +80,7 @@ void Renderer::StartFrame()
     glCullFace(GL_BACK);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    view_ = Matrix::Camera(cameraPosition_, cameraLookAt_);
+    view_ = Matrix::Camera(cameraPosition_, cameraLookAt_, cameraUp_);
 }
 
 void Renderer::EndFrame()
@@ -96,6 +122,30 @@ void Renderer::Draw(shared_ptr<RenderObject> renderObject, GLenum type)
         SetTextures(renderObject->program, renderObject->textureBindings);
 
     renderObject->object->Draw(type);
+}
+
+void Renderer::DrawFullscreenQuad(string programName, unordered_map<unsigned int, string> textures)
+{
+    shared_ptr<ShaderProgram> program = shaders_[programName];
+    program->Activate();
+
+    GLint m = glGetUniformLocation(program->Handle(), "m");
+    GLint v = glGetUniformLocation(program->Handle(), "v");
+    GLint p = glGetUniformLocation(program->Handle(), "p");
+
+    Matrix identity;
+    glUniformMatrix4fv(m, 1, GL_FALSE, identity.gl());
+    glUniformMatrix4fv(v, 1, GL_FALSE, identity.gl());
+    glUniformMatrix4fv(p, 1, GL_FALSE, Matrix::Ortho(1, 1).gl());
+
+    if (textures.size() > 0)
+        SetTextures(programName, textures);
+
+    glDisable(GL_DEPTH_TEST);
+
+    quad_.Draw(GL_TRIANGLES);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Renderer::DrawText(string text, Vector position, float size, Vector colour)

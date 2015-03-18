@@ -8,13 +8,4 @@ Swarm cube map stolen from Jockum 'Hipshot' Skoglund
 
 TODO
 
-Shadows
-Fog?
-Normal mapping?
-Gloss mapping?
-post-processing
-    Glows
-    Anti-aliasing
-    Depth of field
-    Bokeh?
-    Tone mapping?
+- Allow better control over Framebuffer attachments
