@@ -64,6 +64,7 @@ private:
     shared_ptr<RenderObject> skybox_;
     shared_ptr<RenderObject> terrain_;
     float rotation_ = 0;
+    shared_ptr<Framebuffer> framebuffer_;
 };
 
 float GetHeight(vector<float> noise, int x, int y)
@@ -111,6 +112,7 @@ void TerrainWorld::Init(shared_ptr<Renderer> renderer)
 {
     renderer->AddShader("terrain", "terrain");
     renderer->AddShader("skybox", "skybox");
+    renderer->AddShader("fbo", "fbo");
 
     vector<string> skyboxFilenames = { "posx.jpg", "negx.jpg", "posy.jpg", "negy.jpg", "posz.jpg", "negz.jpg" };
     renderer->AddCubeTexture("skybox", skyboxFilenames);
@@ -256,6 +258,11 @@ void TerrainWorld::Init(shared_ptr<Renderer> renderer)
     terrain_->textureBindings.insert(make_pair(3, "texture_mask.png"));
 
     renderer->SetCameraPosition(Vector(0, 10, 0));
+
+    framebuffer_ = make_shared<Framebuffer>(512, 512);
+
+    renderer->AddTexture("fbo_colour", framebuffer_->GetTexture());
+    renderer->AddTexture("fbo_depth", framebuffer_->GetDepth());
 }
 
 void TerrainWorld::Upate(float msecs)
@@ -267,6 +274,12 @@ void TerrainWorld::Upate(float msecs)
 
 void TerrainWorld::Draw(shared_ptr<Renderer> renderer)
 {
+    renderer->SetFramebuffer(framebuffer_);
+
+    glClearColor(1, 0, 1, 1);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    renderer->SetCameraPosition(Vector(0, 10, 0));
     renderer->SetCameraLookAt(Vector(sinf(rotation_), 10, cosf(rotation_)));
 
     glDepthMask(GL_FALSE);
@@ -274,6 +287,17 @@ void TerrainWorld::Draw(shared_ptr<Renderer> renderer)
 
     glDepthMask(GL_TRUE);
     renderer->Draw(terrain_);
+    
+    renderer->ResetFramebuffer();
+
+    glClearColor(0, 0, 1, 1);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    unordered_map<unsigned int, string> textures;
+    textures.insert(make_pair(0, "fbo_colour"));
+    textures.insert(make_pair(1, "fbo_depth"));
+
+    renderer->DrawFullscreenQuad("fbo|fbo", textures);
 }
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev, LPSTR commandLine, int show)

@@ -17,22 +17,10 @@ void main()
 {
     vec3 n = normalize(normal);
     vec3 lightDir = normalize(vec3(0.0, 0, 0.5));
-    float diffuse = max(0.0, dot(n, -lightDir));
+    float diffuse = max(0.0, dot(n, -lightDir)) * 0.75;
+
+    vec3 fogColour = vec3(0.0, 0.0, 0.5);
+    float fogValue = (gl_FragCoord.z / gl_FragCoord.w) / 30.0;
     
-    float light = 0.4 + 0.6 * diffuse;
-
-    vec3 grassColour = texture(grass, texCoord).rgb;
-    vec3 snowColour = texture(snow, texCoord).rgb;
-    vec3 rockColour = texture(rock, texCoord).rgb;
-    float mask = texture(mask, texCoord).g;
-    vec3 grassColour2 = texture(grass, texCoord2).rgb;
-    vec3 snowColour2 = texture(snow, texCoord2).rgb;
-    vec3 rockColour2 = texture(rock, texCoord2).rgb;
-
-    vec3 t = types / (types.x + types.y + types.z);
-    fragColour = vec4(
-        (
-            ((grassColour * t.x + rockColour * t.y + snowColour * t.z) * (1.0 - mask)) 
-            + ((grassColour2 * t.x + rockColour2 * t.y + snowColour2 * t.z) *  mask)
-        ) * colour * light, 1.0);
+    fragColour = vec4(fogColour * fogValue + vec3(diffuse) * (1.0 - fogValue), 1.0);
 }
