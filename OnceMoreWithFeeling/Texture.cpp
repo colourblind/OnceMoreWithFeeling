@@ -70,7 +70,10 @@ GLuint OnceMoreWithFeeling::LoadCubeTexture(vector<string> filenames)
             break;
         }
 
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        if (i == 0)
+            glTexStorage2D(GL_TEXTURE_CUBE_MAP, 1, internalFormat, width, height);
+
+        glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, format, GL_UNSIGNED_BYTE, data);
         stbi_image_free(data);
     }
 

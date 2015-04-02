@@ -110,7 +110,7 @@ Window::Window(HINSTANCE instance, int show, unsigned int width, unsigned int he
     {
         int attributes[] = {
             WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-            WGL_CONTEXT_MINOR_VERSION_ARB, 0,
+            WGL_CONTEXT_MINOR_VERSION_ARB, 2,
             WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
             0
         };

@@ -15,7 +15,7 @@ Framebuffer::Framebuffer(unsigned int width, unsigned int height) :
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width_, height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB8, width_, height_);
 
     // Depth renderbuffer
     //glGenRenderbuffers(1, &depth_);
@@ -32,8 +32,7 @@ Framebuffer::Framebuffer(unsigned int width, unsigned int height) :
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
     //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width_, height_, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT24, width_, height_);
 
     // Framebuffer and attachments
     glGenFramebuffers(1, &handle_);

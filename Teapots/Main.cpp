@@ -77,7 +77,6 @@ void TeapotWorld::Init(shared_ptr<Renderer> renderer)
     renderer->SetUniform("full|full", 2, 128.f); // shininess
 
     shared_ptr<Buffer> cubeVertexBuffer = make_shared<Buffer>();
-    shared_ptr<Buffer> cubeNormalBuffer = make_shared<Buffer>();
 
     cubeVertexBuffer->SetData(cubeVerts, 108);
 

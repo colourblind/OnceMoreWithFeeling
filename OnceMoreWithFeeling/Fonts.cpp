@@ -8,7 +8,8 @@ Font::Font() : glyphs_(FONT_DATA, FONT_DATA + 96), textureWidth_(FONT_WIDTH), te
 {
     glGenTextures(1, &texture_);
     glBindTexture(GL_TEXTURE_2D, texture_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, textureWidth_, textureHeight_, 0, GL_RED, GL_UNSIGNED_BYTE, FONT_TEXTURE);
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_R8, textureWidth_, textureHeight_);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, textureWidth_, textureWidth_, GL_RED, GL_UNSIGNED_BYTE, FONT_TEXTURE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
