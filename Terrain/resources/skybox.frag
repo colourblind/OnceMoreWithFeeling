@@ -9,7 +9,7 @@ layout(location = 0) uniform samplerCube environment;
 void main()
 {
     //fragColour = texture(environment, normalize(texCoord));
-    float x = clamp(0.0, 1.0, dot(vec3(0.0, 1.0, 0.0), normalize(texCoord)) * 1.5);
+    float x = clamp(dot(vec3(0.0, 1.0, 0.0), normalize(texCoord)) * 1.5, 0.0, 1.0);
     vec3 skyColour = smoothstep(vec3(0.0, 0.0, 1.0), vec3(1.0, 1.0, 0.5), vec3(x));
     fragColour = vec4(skyColour, 1.0);
 }

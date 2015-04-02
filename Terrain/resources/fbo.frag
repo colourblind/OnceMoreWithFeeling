@@ -23,9 +23,9 @@ void main()
     float d4 = texture(depth, texCoord + vec2(DEPTH_OFFSETS, 0.0)).r;
     
     float diff = abs(d0 - d1) + abs(d0 - d2) + abs(d0 - d3) + abs(d0 - d4);
-    diff = clamp(0.0, 1.0, diff * d0 * EDGE_DETECTION_SCALE);
+    diff = clamp(diff * d0 * EDGE_DETECTION_SCALE, 0.0, 1.0);
     
     vec4 d = vec4(diff, diff, 0.0, 1.0);
 
-    fragColour = clamp(vec4(0.0, 0.0, 0.0, 1.0), vec4(1.0, 1.0, 1.0, 1.0), c + d);
+    fragColour = clamp(c + d, vec4(0.0, 0.0, 0.0, 1.0), vec4(1.0, 1.0, 1.0, 1.0));
 }
