@@ -80,6 +80,39 @@ GLuint OnceMoreWithFeeling::LoadCubeTexture(vector<string> filenames)
     return handle;
 }
 
+GLuint OnceMoreWithFeeling::CreateTexture(vector<float> &data, unsigned int width, unsigned int height, unsigned int componentsPerPixel)
+{
+    GLuint handle;
+    glGenTextures(1, &handle);
+    glBindTexture(GL_TEXTURE_2D, handle);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    GLenum internalFormat = GL_RGB8;
+    GLenum format = GL_RGB;
+    switch (componentsPerPixel)
+    {
+    case 1:
+        internalFormat = GL_R32F;
+        format = GL_RED;
+        break;
+    case 4:
+        internalFormat = GL_RGBA8;
+        format = GL_RGBA;
+        break;
+    }
+
+    glTexStorage2D(GL_TEXTURE_2D, 4, internalFormat, width, height);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, format, GL_FLOAT, &data[0]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    return handle;
+}
+
 void OnceMoreWithFeeling::SaveImage(string filename, unsigned int width, unsigned int height, vector<unsigned char> &data)
 {
     int result = stbi_write_png(filename.c_str(), width, height, 4, &data[0], 0);

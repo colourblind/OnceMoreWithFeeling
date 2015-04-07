@@ -49,7 +49,8 @@ vector<float> quadTexcoords = {
 };
 
 Renderer::Renderer() : font_(), frameCount_(0), totalFrameCount_(0), fps_(0), 
-    cameraPosition_(0, 0, 7), cameraLookAt_(0, 0, 0), cameraUp_(0, 1, 0)
+    cameraPosition_(0, 0, 7), cameraLookAt_(0, 0, 0), cameraUp_(0, 1, 0),
+    clearMask_(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 {
     shared_ptr<ShaderProgram> textProgram = make_shared<ShaderProgram>();
     textProgram->Build(TEXT_VERTEX_SOURCE, TEXT_FRAGMENT_SOURCE);
@@ -78,7 +79,8 @@ void Renderer::StartFrame()
     glViewport(0, 0, width_, height_);
     glEnable(GL_DEPTH_TEST);
     glCullFace(GL_BACK);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if (clearMask_ > 0)
+        glClear(clearMask_);
 
     view_ = Matrix::Camera(cameraPosition_, cameraLookAt_, cameraUp_);
 }
@@ -142,9 +144,12 @@ void Renderer::DrawFullscreenQuad(string programName, unordered_map<unsigned int
         SetTextures(programName, textures);
 
     glDisable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
 
     quad_.Draw(GL_TRIANGLES);
 
+    glDepthMask(GL_TRUE);
+    glEnable(GL_DEPTH_TEST);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -283,6 +288,11 @@ void Renderer::SetUniform(string program, int location, float value)
 void Renderer::SetUniform(string program, int location, Vector value)
 {
     glProgramUniform3fv(shaders_[program]->Handle(), location, 1, value.gl());
+}
+
+void Renderer::SetUniform(string program, int location, Matrix value)
+{
+    glProgramUniformMatrix4fv(shaders_[program]->Handle(), location, 1, GL_FALSE, value.gl());
 }
 
 void Renderer::SetTextures(string program, unordered_map<unsigned int, string> bindings)

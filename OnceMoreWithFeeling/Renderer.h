@@ -57,11 +57,14 @@ namespace OnceMoreWithFeeling
         void SetUniform(std::string program, int location, int value);
         void SetUniform(std::string program, int location, float value);
         void SetUniform(std::string program, int location, Vector value);
+        void SetUniform(std::string program, int location, Matrix value);
 
         void SetTextures(std::string program, std::unordered_map<unsigned int, std::string> binding);
 
         void SetFramebuffer(std::shared_ptr<Framebuffer> framebuffer);
         void ResetFramebuffer();
+
+        void SetClearMask(GLbitfield mask) { clearMask_ = mask; }
 
     protected:
         std::unordered_map<std::string, std::shared_ptr<ShaderProgram>> shaders_;
@@ -78,5 +81,6 @@ namespace OnceMoreWithFeeling
         Vector cameraLookAt_;
         Vector cameraUp_;
         Object quad_;
+        GLbitfield clearMask_;
     };
 }
