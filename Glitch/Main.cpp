@@ -119,11 +119,14 @@ private:
 
 void GlitchWorld::Init(shared_ptr<Renderer> renderer)
 {
+    unsigned int width, height;
+    renderer->GetWindowSize(width, height);
+
     renderer->AddShader("basic", "basic");
     renderer->AddShader("final", "final");
     renderer->AddShader("final", "radial");
 
-    fbo_ = make_shared<Framebuffer>(512, 512);
+    fbo_ = make_shared<Framebuffer>(width, height);
 
     renderer->AddTexture("fbo_colour", fbo_->GetTexture());
     renderer->AddTexture("fbo_depth", fbo_->GetDepth());
@@ -182,7 +185,7 @@ void GlitchWorld::Init(shared_ptr<Renderer> renderer)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB8, 512, 512);
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB8, width, height);
 
     fbo_->Activate();
     glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, glowAttachment, 0);
@@ -262,6 +265,5 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev, LPSTR commandLine, int sh
     shared_ptr<Renderer> renderer = make_shared<Renderer>();
     shared_ptr<World> world = make_shared<GlitchWorld>();
 
-    world->Init(renderer);
     return w.Loop(world, renderer);
 }

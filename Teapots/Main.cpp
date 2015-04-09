@@ -159,6 +159,5 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev, LPSTR commandLine, int sh
     shared_ptr<Renderer> renderer = make_shared<Renderer>();
     shared_ptr<World> world = make_shared<TeapotWorld>();
 
-    world->Init(renderer);
     return w.Loop(world, renderer);
 }

@@ -259,7 +259,9 @@ void TerrainWorld::Init(shared_ptr<Renderer> renderer)
 
     renderer->SetCameraPosition(Vector(0, 10, 0));
 
-    framebuffer_ = make_shared<Framebuffer>(512, 512);
+    unsigned int width, height;
+    renderer->GetWindowSize(width, height);
+    framebuffer_ = make_shared<Framebuffer>(width, height);
 
     renderer->AddTexture("fbo_colour", framebuffer_->GetTexture());
     renderer->AddTexture("fbo_depth", framebuffer_->GetDepth());
@@ -308,6 +310,5 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev, LPSTR commandLine, int sh
     shared_ptr<Renderer> renderer = make_shared<Renderer>();
     shared_ptr<World> world = make_shared<TerrainWorld>();
 
-    world->Init(renderer);
     return w.Loop(world, renderer);
 }

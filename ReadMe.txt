@@ -9,3 +9,4 @@ Swarm cube map stolen from Jockum 'Hipshot' Skoglund
 TODO
 
 - Allow better control over Framebuffer attachments
+- Callback into World on window resize to recreate FBOs?

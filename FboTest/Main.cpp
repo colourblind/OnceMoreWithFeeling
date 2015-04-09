@@ -116,7 +116,7 @@ void FboTestWorld::Init(shared_ptr<Renderer> renderer)
     
     framebuffer_ = make_shared<Framebuffer>(512, 512);
 
-    renderer->AddTexture("fbo", framebuffer_->GetTexture());
+    renderer->AddTexture("fbo", framebuffer_->GetDepth());
 
     shared_ptr<Buffer> vertBuffer = make_shared<Buffer>();
     shared_ptr<Buffer> texCoordBuffer = make_shared<Buffer>();
@@ -183,6 +183,5 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev, LPSTR commandLine, int sh
     shared_ptr<Renderer> renderer = make_shared<Renderer>();
     shared_ptr<World> world = make_shared<FboTestWorld>();
 
-    world->Init(renderer);
     return w.Loop(world, renderer);
 }

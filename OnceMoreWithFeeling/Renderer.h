@@ -52,6 +52,7 @@ namespace OnceMoreWithFeeling
         void AddTexture(std::string textureName, GLuint handle);
         void AddCubeTexture(std::string textureName, std::vector<std::string> filenames);
         void SetWindowSize(unsigned int width, unsigned int height);
+        void GetWindowSize(unsigned int &width, unsigned int &height) { width = width_; height = height_; }
         void ResetFrameCount() { fps_ = frameCount_; frameCount_ = 0; }
 
         void SetUniform(std::string program, int location, int value);
