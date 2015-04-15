@@ -6,6 +6,7 @@ using namespace OnceMoreWithFeeling;
 using namespace std;
 
 shared_ptr<Renderer> Window::renderer_ = nullptr;
+shared_ptr<World> Window::world_ = nullptr;
 Input Window::input_;
 
 LRESULT CALLBACK Window::WndProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
@@ -21,6 +22,7 @@ LRESULT CALLBACK Window::WndProc(HWND window, UINT message, WPARAM wParam, LPARA
             break;
         case WM_SIZE:
             renderer_->SetWindowSize(LOWORD(lParam), HIWORD(lParam));
+            world_->Resize(renderer_);
             break;
         case WM_KEYDOWN:
             if (!(lParam & 0x40000000)) // repeats
@@ -138,6 +140,10 @@ Window::~Window()
 
 int Window::Loop(shared_ptr<World> world, shared_ptr<Renderer> renderer)
 {
+    // Was hoping to avoid having this as a static, but we need it to 
+    // resize from the message handler
+    world_ = world;
+
     RECT rect;
     ::GetClientRect(window_, &rect);
     width_ = rect.right - rect.left;

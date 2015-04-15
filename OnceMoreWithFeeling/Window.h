@@ -22,7 +22,7 @@ namespace OnceMoreWithFeeling
         static LRESULT CALLBACK WndProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
 
     protected:
-        std::shared_ptr<World> world_;
+        static std::shared_ptr<World> world_;
         static std::shared_ptr<Renderer> renderer_;
         static Input input_;
         HWND window_;

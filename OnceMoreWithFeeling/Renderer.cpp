@@ -254,18 +254,28 @@ void Renderer::AddShader(string vertexShaderName, string fragmentShaderName)
 void Renderer::AddTexture(string textureName)
 {
     GLuint handle = LoadTexture(textureName);
-    textures_.insert(make_pair(textureName, make_pair(GL_TEXTURE_2D, handle)));
+    AddTexture(textureName, handle);
 }
 
 void Renderer::AddTexture(string textureName, GLuint handle)
 {
-    textures_.insert(make_pair(textureName, make_pair(GL_TEXTURE_2D, handle)));
+    // If a texture is replaced we don't delete the existing one, since we have
+    // no way of knowing if it's used elsewhere.
+    textures_[textureName] = make_pair(GL_TEXTURE_2D, handle);
 }
 
 void Renderer::AddCubeTexture(string textureName, vector<string> filenames)
 {
     GLuint handle = LoadCubeTexture(filenames);
-    textures_.insert(make_pair(textureName, make_pair(GL_TEXTURE_CUBE_MAP, handle)));
+    AddTexture(textureName, handle);
+}
+
+GLuint Renderer::GetTexture(string textureName)
+{
+    auto t = textures_.find(textureName);
+    if (t == textures_.end())
+        return 0;
+    return t->second.second;
 }
 
 void Renderer::SetWindowSize(unsigned int width, unsigned int height)
