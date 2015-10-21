@@ -55,6 +55,18 @@ void OnceMoreWithFeeling::CreateNoise(vector<float> &data, int octaves, int widt
     }
 }
 
+void OnceMoreWithFeeling::CreateShitNoise(vector<float> &data, int width, int height)
+{
+    data.resize(width * height, 0);
+    for (int y = 0; y < height; ++y)
+    {
+        for (int x = 0; x < width; ++x)
+        {
+            data[y * width + x] = ::RandF(0, 1);
+        }
+    }
+}
+
 float OnceMoreWithFeeling::Lerp(float a, float b, float t)
 {
     return a * (1.f - t) + b * t;
