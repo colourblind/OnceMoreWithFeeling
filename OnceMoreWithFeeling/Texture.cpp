@@ -8,7 +8,7 @@
 using namespace OnceMoreWithFeeling;
 using namespace std;
 
-GLuint OnceMoreWithFeeling::LoadTexture(string filename)
+GLuint OnceMoreWithFeeling::LoadTexture(string filename, GLuint wrap)
 {
     int width, height, componentsPerPixel;
 
@@ -18,8 +18,8 @@ GLuint OnceMoreWithFeeling::LoadTexture(string filename)
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 
     unsigned char *data = stbi_load(filename.c_str(), &width, &height, &componentsPerPixel, 0);
 

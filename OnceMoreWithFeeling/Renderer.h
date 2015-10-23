@@ -49,6 +49,7 @@ namespace OnceMoreWithFeeling
 
         void AddShader(std::string vertexShaderName, std::string fragmentShaderName);
         void AddTexture(std::string textureName);
+        void AddWrappingTexture(std::string textureName);
         void AddTexture(std::string textureName, GLuint handle);
         void AddCubeTexture(std::string textureName, std::vector<std::string> filenames);
         GLuint GetTexture(std::string textureName);

@@ -257,6 +257,12 @@ void Renderer::AddTexture(string textureName)
     AddTexture(textureName, handle);
 }
 
+void Renderer::AddWrappingTexture(string textureName)
+{
+    GLuint handle = LoadTexture(textureName, GL_REPEAT);
+    AddTexture(textureName, handle);
+}
+
 void Renderer::AddTexture(string textureName, GLuint handle)
 {
     // If a texture is replaced we don't delete the existing one, since we have
