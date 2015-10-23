@@ -17,7 +17,10 @@ void main()
     float lightDistance = length(worldPosition - lightPosition) * 0.15;
     float flash = dot(normal, -normalize(lightVector)) * lightStrength / pow(lightDistance, 2.0);
     
-    float depth = gl_FragCoord.z;
+    float depth = gl_FragCoord.z / gl_FragCoord.w;
+    float alpha = sin(clamp(depth / 50.0, 0.0, 1.0) * 3.142);
     
-    fragColour = vec4(colour * min(1.0, texCoord.t + 0.5) + max(0.0, flash), texture(cloudTexture, texCoord).r * pow(depth, 8.0));
+    // rgb: passed colour * cloud.y (using texCoord.t, start falloff at 0.5) + flash ---- should probably clamp
+    // a: use red channel of texture * distance-based fade-in/out
+    fragColour = vec4(clamp(colour * min(1.0, texCoord.t + 0.5) + max(0.0, flash), 0.0, 1.0), texture(cloudTexture, texCoord).r * alpha);
 }
