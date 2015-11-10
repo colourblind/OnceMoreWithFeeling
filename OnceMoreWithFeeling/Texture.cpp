@@ -80,7 +80,7 @@ GLuint OnceMoreWithFeeling::LoadCubeTexture(vector<string> filenames)
     return handle;
 }
 
-GLuint OnceMoreWithFeeling::CreateTexture(vector<float> &data, unsigned int width, unsigned int height, unsigned int componentsPerPixel)
+GLuint OnceMoreWithFeeling::CreateTexture(vector<float> &data, unsigned int width, unsigned int height, unsigned int componentsPerPixel, GLuint wrap)
 {
     GLuint handle;
     glGenTextures(1, &handle);
@@ -88,8 +88,8 @@ GLuint OnceMoreWithFeeling::CreateTexture(vector<float> &data, unsigned int widt
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 
     GLenum internalFormat = GL_RGB8;
     GLenum format = GL_RGB;
@@ -98,6 +98,10 @@ GLuint OnceMoreWithFeeling::CreateTexture(vector<float> &data, unsigned int widt
     case 1:
         internalFormat = GL_R32F;
         format = GL_RED;
+        break;
+    case 2:
+        internalFormat = GL_RG8;
+        format = GL_RG;
         break;
     case 4:
         internalFormat = GL_RGBA8;

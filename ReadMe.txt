@@ -10,3 +10,6 @@ TODO
 
 - Allow better control over Framebuffer attachments
 - Callback into World on window resize to recreate FBOs?
+
+- Option to use other RNGs in noise functions
+- Multi-component noise functions?

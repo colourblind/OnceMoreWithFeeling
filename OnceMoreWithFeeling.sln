@@ -24,6 +24,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Terrain", "Terrain\Terrain.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Glitch", "Glitch\Glitch.vcxproj", "{C7DFDC95-867C-4405-B2E2-11FDC3D6F75C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Glitch0", "Glitch0\Glitch0.vcxproj", "{A01F74A3-023D-4E7E-8BEA-FD3540464500}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -92,6 +94,14 @@ Global
 		{C7DFDC95-867C-4405-B2E2-11FDC3D6F75C}.Release|Win32.Build.0 = Release|Win32
 		{C7DFDC95-867C-4405-B2E2-11FDC3D6F75C}.ReleaseDynamic|Win32.ActiveCfg = Release|Win32
 		{C7DFDC95-867C-4405-B2E2-11FDC3D6F75C}.ReleaseDynamic|Win32.Build.0 = Release|Win32
+		{A01F74A3-023D-4E7E-8BEA-FD3540464500}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A01F74A3-023D-4E7E-8BEA-FD3540464500}.Debug|Win32.Build.0 = Debug|Win32
+		{A01F74A3-023D-4E7E-8BEA-FD3540464500}.DebugDynamic|Win32.ActiveCfg = Debug|Win32
+		{A01F74A3-023D-4E7E-8BEA-FD3540464500}.DebugDynamic|Win32.Build.0 = Debug|Win32
+		{A01F74A3-023D-4E7E-8BEA-FD3540464500}.Release|Win32.ActiveCfg = Release|Win32
+		{A01F74A3-023D-4E7E-8BEA-FD3540464500}.Release|Win32.Build.0 = Release|Win32
+		{A01F74A3-023D-4E7E-8BEA-FD3540464500}.ReleaseDynamic|Win32.ActiveCfg = Release|Win32
+		{A01F74A3-023D-4E7E-8BEA-FD3540464500}.ReleaseDynamic|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
