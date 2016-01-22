@@ -268,10 +268,10 @@ void Glitch0World::Upate(float msecs)
     if (input.GetState(0x44)) // D
         cameraPosition_ = cameraPosition_ + right * 0.01f * msecs;
 
-    totalTime_ += msecs / 100.0;
+    totalTime_ += msecs / 10.0;
     if (totalTime_ > 512)
         totalTime_ -= 512;
-    tickTime_ += msecs;
+    tickTime_ = msecs;
 }
 
 void Glitch0World::Draw(shared_ptr<Renderer> renderer)

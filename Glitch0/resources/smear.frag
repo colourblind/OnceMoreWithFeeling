@@ -18,12 +18,12 @@ layout(location = 0) out vec4 fragColour;
 
 void main()
 {
-    //vec2 offset = texture(noise1, texCoord + vec2(rand0, rand1)).xy - vec2(0.35, 0.35);
-    vec2 offset = texture(noise1, texCoord).xy - vec2(0.35, 0.35);
-    offset = normalize(offset) * tickTime * 0.00001;
+    vec2 offset = texture(noise1, texCoord + vec2(rand0, rand1)).xy - vec2(0.35, 0.35);
+    //vec2 offset = texture(noise1, texCoord).xy - vec2(0.35, 0.35);
+    offset = normalize(offset) * tickTime * 0.001;
     //offset = offset / 128.0;
     vec2 t = texCoord + offset;
-    fragColour = texture(lastFrame, t) * (0.75 + 0.25 * fract(rand1));
+    fragColour = texture(lastFrame, t);
     //fragColour.g = 0.0;
-    fragColour.a = 0.999 * tickTime;
+    fragColour.a = 0.5 * (0.75 + 0.25 * fract(rand1)) * tickTime;
 }
