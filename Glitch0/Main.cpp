@@ -205,11 +205,17 @@ void Glitch0World::Init(shared_ptr<Renderer> renderer)
     GLuint noiseTexture1 = CreateTexture(noise1, 1024, 1024, 2, GL_REPEAT);
     renderer->AddTexture("noise1", noiseTexture1);
 
+    vector<float> noise2;
+    CreateNoise(noise2, 5, 1024, 1024, 12);
+    GLuint noiseTexture2 = CreateTexture(noise2, 1024, 1024, 1);
+    renderer->AddTexture("noise2", noiseTexture2);
+
     textureBindings_.insert(make_pair(0, "fbo_colour"));
     textureBindings_.insert(make_pair(1, "fbo_depth"));
     textureBindings_.insert(make_pair(2, "noise0"));
     textureBindings_.insert(make_pair(3, "noise1"));
     textureBindings_.insert(make_pair(4, "last_frame"));
+    textureBindings_.insert(make_pair(6, "noise2"));
 
     glitch_->textureBindings = textureBindings_;
     
